@@ -1,0 +1,545 @@
+@use "sass:map";
+@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@300;400;700&display=swap');
+
+$light-bg: #ffffff;
+$light-text: black;
+$primary-color: #0d6efd;
+$success-color: #00bc7d;
+
+
+$dark-bg: black;
+$dark-text: rgb(235, 235, 235);;
+
+$primary-font: 'League Spartan', sans-serif;
+$secondary-font: Arial, sans-serif;
+
+$breakpoints: (
+    "xs": 400px,
+    "sm": 576px,
+    "md": 768px,
+    "lg": 992px,
+    "xl": 1200px,
+    "xxl": 1400px
+);
+
+@mixin responsive($size) {
+    @media (max-width: map.get($breakpoints, $size)) {
+      @content;
+    }
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+h1,h2,h3,h4,h5,h6 {
+    font-family: $primary-font;
+    margin: 0;
+}
+p, button, span, label {
+    font-family: $primary-font;
+    font-weight: 100;
+}
+
+label {
+    font-weight: 400;
+    font-size: 16px;
+    
+    i {
+        margin-right: 5px;
+    }
+
+}
+
+a {
+    text-decoration: none;
+    font-family: $primary-font;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+}
+
+.input {
+    height: 35px;
+    padding: 0.35rem 0.8rem;
+    border: none;
+    border-radius: 0.25rem;
+    margin-top: 3px;
+    font-family: $primary-font;
+
+    background-color: #222225 !important;
+    color: white;
+    border: 1px solid #454545;
+
+    &:focus {
+        outline: 1px solid rgb(0, 162, 108);
+        box-shadow: 0 0 5px rgb(0, 162, 108);
+    }
+}
+
+
+/*
+.input.input-dark {
+    background-color: #222225;
+    color: white;
+    border: 1px solid #454545;
+}
+
+
+.input.input-light {
+    background-color: #222225 !important;
+    color: black !important;
+    border: 1px solid rgb(221, 221, 221) !important;
+}
+*/
+
+body {
+    display: flex;
+    justify-content: center;
+    overflow-x: hidden;
+    background-color: $dark-bg;
+    color: $dark-text;
+}
+
+
+.signin-main-container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 0 20px;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 448px;
+    background-color: #18181B;
+    border: 1px solid #303030;
+    padding: 23px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+    border-radius: 10px;
+    
+
+    h1 {
+        margin-top: 10px;
+        margin-bottom: 13px;
+        font-size: 32px;
+    }
+
+    p {
+        font-size: 16px;
+        opacity: 50%;
+    }
+
+    a {
+        margin-top: 5px;
+        width: 100%;
+        text-align: center;
+        padding: 15px;
+        background-color: #222225;
+        border: 1px solid #4b4b4b;
+        border-radius: 5px;
+        font-size: 16px;
+        transition: background-color 0.2s ease;
+        color: $dark-text;
+
+        i {
+            margin-right: 10px;
+        }
+
+        &:hover {
+            background-color: #303034;
+        }
+    }
+
+}
+
+.tracker-main-container {
+    width: 100%;
+    max-width: 870px;
+    margin: 0 15px;
+
+    .cont {
+        display: flex;
+        flex-direction: column;
+        width: calc(50% - 10px);
+        height: auto;
+        background-color: #18181B;
+        border: 1px solid #303030;
+        border-radius: 10px;
+        padding: 20px;
+    }
+
+    .header {
+
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 25px;
+
+        .settings {
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            position: relative;
+
+            .profile-photo {
+
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                background-color: pink;
+                overflow: hidden;
+                cursor: pointer;
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover; 
+                }
+
+            }
+
+            .logout-button {
+                display: flex;
+                width: 130px;
+                height: 45px;
+                align-items: center;
+                padding-right: 20px;
+                gap: 5px;
+                justify-content: end;
+                position: absolute;
+                top: 50px; 
+                right: 0;
+                background-color: #222225;
+                border: 1px solid #4b4b4b;
+                border-radius: 8px;
+                transform: scaleY(0);
+                transform-origin: top;
+                opacity: 0;
+                transition: transform 0.25s ease, opacity 0.25s ease;
+                z-index: 1000;
+                pointer-events: none;
+
+                button {
+                    border: none;
+                    background: transparent;
+                    color: white;
+                }
+
+                i, button {
+                    font-size: 16px;
+                }
+
+                &:hover {
+                    i,button {
+                        color: #0d6efd;
+                    }
+                }
+
+            }
+
+            .logout-button.show {
+                transform: scaleY(1);
+                display: flex;
+                opacity: 1;
+                pointer-events: auto;
+                cursor: pointer;
+              }
+
+            .theme-toggle {
+
+                .checkbox {
+                    opacity: 0;
+                    position: absolute;
+                }  
+
+                .checkbox-label {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between !important;
+                    position: relative;
+                    background-color: #49494d;
+                    width: 50px;
+                    height: 26px;
+                    border-radius: 50px;
+                    padding: 5px;
+                    cursor: pointer;
+                    
+
+                }
+
+                .fa-moon {color: #f1c40f;}
+                .fa-sun {color: #f39c12;}
+
+                .checkbox-label .ball {
+                    background-color: #fff;
+                    width: 22px;
+                    height: 22px;
+                    position: absolute;
+                    left: 2px;
+                    top: 2px;
+                    border-radius: 50%;
+                    transition: transform 0.2s linear;
+                }
+
+                .checkbox:checked + .checkbox-label .ball {
+                    transform: translateX(24px);
+                }
+            }
+        }
+    }
+
+    .activity-container {
+
+        display: flex;
+        justify-content: space-between;
+        margin-top: 30px;
+
+        @include responsive("md") {
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .cont {
+
+            @include responsive("md") {
+                width: 100%;
+            }
+
+            h3 {
+                margin-bottom: 20px;
+                align-self: flex-start;
+            }
+
+            &.progress-container {
+                
+                align-items: center;
+    
+                .progress {
+                    width: 200px;
+                    height: 200px;
+                    position: relative;
+                    
+                    .progress-circle {
+                        width: 100%;
+                        height: 100%;
+                        transform: rotate(-90deg);
+                        
+                        .progress-circle-bg {
+                            fill: none;
+                            stroke: #303030; /* Darker background for dark theme */
+                            stroke-width: 10;
+                        }
+                        
+                        .progress-circle-fill {
+                            fill: none;
+                            stroke: $success-color; /* Blue-500 from Tailwind */
+                            stroke-width: 9;
+                            stroke-linecap: round;
+                            transition: stroke-dashoffset 0.5s ease;
+
+                        }
+                    }
+                    
+                    .progress-text {
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        text-align: center;
+                        width: 100%;
+                        
+                        .progress-percent {
+                            font-size: 37px;
+                            font-weight: bold;
+                            display: block;
+                            letter-spacing: 1px;
+                        }
+                        
+                        .progress-label {
+                            font-size: 17px;
+                            display: block;
+                            margin-top: 5px;
+                        }
+                    }
+                }
+
+                .progress-bar-bg {
+
+                    width: 100%;
+                    height: 7px;
+                    border-radius: 20px;
+                    background-color: #193930;
+                    display: flex;
+                    overflow: hidden;
+                    margin-top: 18px;
+
+                    .progress-bar {
+                        align-self: flex-start;
+                        width: 70%;
+                        background-color: $success-color;
+                        height: 100%;
+                    }
+                }
+
+                .progress-hours-info {
+                    display: flex;
+                    justify-content: space-between;
+                    width: 100%;
+                    margin-top: 12px;
+                }
+
+                label {
+                    margin-top: 25px;
+                    align-self: flex-start;
+                }
+
+                .hours-input {
+                    width: 100%;
+                    margin-top: 10px;
+                }
+            }
+
+            &.form-container {
+                .date-input {
+                    color: white;
+                    background-color: rgb(113, 113, 113);
+                }
+
+                .time {
+                    margin-top: 20px;
+                }
+
+                .time-container {
+                    display: flex;
+                    gap: 10px;
+                    flex-wrap: wrap;
+
+                    input, p {
+                        width: calc(50% - 5px);
+                    }
+
+                    p {
+                        color: #6a7282;
+                        font-size: 14px;
+                    }
+
+                }
+
+                button {
+                    margin-top: 20px;
+                    padding: 10px 0;
+                    background-color: $success-color;
+                    border: none;
+                    font-weight: 400;
+                    font-size: 16px;
+                    border-radius: 0.25rem;
+                    cursor: pointer;
+
+                    &:hover {
+                        background-color: #04a46e;
+                    }
+
+                }
+            }
+        }
+
+    }
+
+    .time-entry-container {
+        width: 100%;
+        height: 200px;
+        margin-top: 20px;
+
+        .time-entry-header {
+            display: flex;
+            justify-content: space-between;
+
+            i {
+                cursor: pointer;
+
+                &:hover {
+                    color: $success-color;
+                }
+            }
+
+        }
+    }
+}   
+
+
+
+footer {
+    width: 100%;
+    padding: 20px;
+    position: absolute;
+    bottom: 0;
+    text-align: center;
+    font-size: 14px;
+    opacity: 60%;
+
+    a {
+        text-decoration: underline;
+    }
+
+}
+
+
+body.light-mode {
+    background-color: $light-bg !important;
+    color: $light-text !important;
+
+    .cont {
+        background-color: $light-bg !important;
+        color: $light-text !important;
+        border: 1px solid #dee2e6 !important;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+
+        button {
+            color: $light-text !important;
+            cursor: pointer;
+        }
+
+        &:hover .logout-btn {
+            color: $primary-color !important;
+        }
+
+        .progress-circle-bg{
+            stroke: rgb(232, 231, 231) !important;
+        }
+
+        .progress-bar-bg {
+            background-color: #d6f5dd !important;
+        }
+
+    }
+
+    .input {
+        background-color: white !important;
+        color: black !important;
+        border: 1px solid rgb(221, 221, 221) !important;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator,
+    input[type="time"]::-webkit-calendar-picker-indicator {
+        filter: invert(0) !important;
+    }
+
+}

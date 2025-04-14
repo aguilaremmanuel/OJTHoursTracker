@@ -1,0 +1,37 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="el">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OJT Hours Tracker</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body class="dark-mode">
+
+    <section class="signin-main-container">
+        <div class="login-container">
+            <h1>OJT Hours Tracker</h1>
+            <p>Sign in to your google account to continue</p>
+    
+            <a href="{% url 'social:begin' 'google-oauth2' %}">
+                <i class="fa-brands fa-google"></i> Continue with Google
+            </a>
+        </div>
+    </section>
+
+    <!--
+    <footer>
+        <p>Made with ♡ using Django by <span><a href="#">Emman Aguilar</a></span></p>
+    </footer>
+    -->
+    
+</body>
+
+
+
+</html>

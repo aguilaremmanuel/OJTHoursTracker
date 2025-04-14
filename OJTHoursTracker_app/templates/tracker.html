@@ -1,0 +1,207 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OJT Hours Tracker</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <script src="https://cdn.jsdelivr.net/npm/circle-progress@1.2.2/dist/circle-progress.min.js"></script>
+</head>
+<body>
+
+    
+    <!-- <div class="header">
+        <h2>Welcome to Your Profile</h2>
+        <div>
+            <img src="{{ profile_picture }}" alt="Profile Picture" class="profile-pic">
+        </div>
+    </div>
+    
+    <div class="profile-container">
+        <div class="user-info">
+            <h3>Hello, {{ name }}!</h3>
+            <p>Your email: {{ email }}</p>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
+        </div>
+    </div> -->
+
+    <div class="tracker-main-container">
+
+        <div class="header">
+            <h1>OJT Hours Tracker</h1>
+            <div class="settings">
+                <div class="theme-toggle">
+                    <input type="checkbox" class="checkbox" id="checkbox" checked>
+                    <label for="checkbox" class="checkbox-label">
+                      <i class="fas fa-moon" style="margin-right: 10px;"></i>
+                      <i class="fas fa-sun"></i>
+                      <span class="ball"></span>
+                    </label>
+                </div>
+                <div class="profile-photo" id="profileToggle">
+                    <img src="{{ profile_picture }}" alt="Profile Picture" class="profile-pic">
+                </div>
+                <div class="cont logout-button" id="logoutBtn">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    <form method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="logout-btn">Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-container">
+
+            <div class="cont progress-container">
+                <h3>My Progress</h3>
+                
+                <div class="progress">
+                    <svg class="progress-circle" viewBox="0 0 100 100">
+                        <circle class="progress-circle-bg" cx="50" cy="50" r="45" />
+                        <circle class="progress-circle-fill" cx="50" cy="50" r="45" 
+                                stroke-dasharray="282.743" 
+                                stroke-dashoffset="282.743" />
+                    </svg>
+                    <div class="progress-text">
+                        <span class="progress-percent">75%</span>
+                        <span class="progress-label">Complete</span>
+                    </div>
+                </div>
+
+                <div class="progress-bar-bg">
+                    <div class="progress-bar"></div>
+                </div>
+
+                <div class="progress-hours-info">
+                    <span>75 hours completed</span>
+                    <span>500 hours required</span>
+                </div>
+
+                <label for="required_hours">Total Required Hours:</label>
+
+                <input class="input hours-input" type="number" maxlength="4" min="1" name="required_hours" oninput="if(this.value.length > 4) this.value = this.value.slice(0, 4);">
+            </div>
+
+            <div class="cont form-container">
+                <h3>Record Time Entry</h3>
+                <label for="date"><i class="fa-regular fa-calendar"></i> Date</label>
+                <input type="date" class="input date-input" name="date">
+                <div class="time">
+                    <label for=""><i class="fa-regular fa-clock"></i> Morning</label>
+                    <div class="time-container">
+                        <input class="input time-input" type="time" name="time">
+                        <input class="input time-input" type="time" name="time">
+                        <p>Time In</p>
+                        <p>Time Out</p>
+                    </div>
+                </div>
+                <div class="time">
+                    <label for=""><i class="fa-regular fa-clock"></i> Afternoon</label>
+                    <div class="time-container">
+                        <input class="input time-input" type="time" name="time">
+                        <input class="input time-input" type="time" name="time">
+                        <p>Time In</p>
+                        <p>Time Out</p>
+                    </div>
+                </div>
+                <div class="time">
+                    <label for=""><i class="fa-regular fa-clock"></i> Evening (Optional)</label>
+                    <div class="time-container">
+                        <input class="input time-input" type="time" name="time">
+                        <input class="input time-input" type="time" name="time">
+                        <p>Time In</p>
+                        <p>Time Out</p>
+                    </div>
+                </div>
+                <button type="button">Add Time Entry</button>
+            </div>
+
+        </div>
+
+        <div class="cont time-entry-container">
+            <div class="time-entry-header">
+                <h3>Time Entry History</h3>
+                <div>
+                    <i class='bx bx-sort'></i>
+                    <i class='bx bx-filter-alt'></i>
+                </div>
+            </div>
+
+            <div>
+                <div class="title">
+                    <h3>Monday, April 14, 2025</h3>
+                    <div class="action">
+                        <div class="edit"></div>
+                        <div class="delete"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    {% if not user.is_authenticated %}
+        <script>window.location.href = "/";</script>
+    {% endif %}
+    <script>
+
+        function updateProgress(percent) {
+            const circle = document.querySelector('.progress-circle-fill');
+            const percentElement = document.querySelector('.progress-percent');
+            
+            // Calculate the offset (circumference = 2πr)
+            const radius = 45;
+            const circumference = 2 * Math.PI * radius;
+            const offset = circumference - (percent / 100) * circumference;
+            
+            circle.style.strokeDashoffset = offset;
+            percentElement.textContent = percent + '%';
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+
+            updateProgress(70);
+
+            const checkbox = document.getElementById("checkbox")
+            checkbox.addEventListener("change", () => {
+                document.body.classList.toggle("light-mode");
+            });
+
+            const profile = document.getElementById('profileToggle');
+            const logoutBtn = document.getElementById('logoutBtn');
+
+            profile.addEventListener('click', function () {
+                logoutBtn.classList.toggle('show');
+            });
+
+            document.addEventListener('click', function (e) {
+            if (!profile.contains(e.target) && !logoutBtn.contains(e.target)) {
+                logoutBtn.classList.remove('show');
+            }
+            });
+        });
+        /*
+        const theme = localStorage.getItem('theme') || 'auto';
+        alert(theme);
+        
+        document.body.classList.add(`${theme}-mode`);
+        
+        document.getElementById('theme-toggle').value = theme;
+      
+        document.getElementById('theme-toggle').addEventListener('change', (e) => {
+          const newTheme = e.target.value;
+          document.body.classList.remove('light-mode', 'dark-mode', 'auto-mode');
+          document.body.classList.add(`${newTheme}-mode`);
+          localStorage.setItem('theme', newTheme);
+        });
+        */
+      </script>
+</body>
+</html>

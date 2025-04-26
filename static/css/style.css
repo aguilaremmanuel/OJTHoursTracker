@@ -36,6 +36,9 @@ input[type=date]::-webkit-calendar-picker-indicator,
 input[type=time]::-webkit-calendar-picker-indicator {
   filter: invert(1);
   cursor: pointer;
+  color: #c6c5c5;
+  color: #d9d4d4;
+  color: #6a0007;
 }
 
 .input {
@@ -335,6 +338,7 @@ body {
   margin-top: 10px;
 }
 .tracker-main-container .activity-container .cont.form-container .date-input {
+  width: 100%;
   color: white;
   background-color: rgb(113, 113, 113);
 }
@@ -354,6 +358,7 @@ body {
   font-size: 14px;
 }
 .tracker-main-container .activity-container .cont.form-container button {
+  width: 100%;
   margin-top: 20px;
   padding: 10px 0;
   background-color: #00bc7d;
@@ -362,24 +367,94 @@ body {
   font-size: 16px;
   border-radius: 0.25rem;
   cursor: pointer;
+  opacity: 50%;
+  color: white;
 }
 .tracker-main-container .activity-container .cont.form-container button:hover {
   background-color: #04a46e;
 }
+.tracker-main-container .activity-container .cont.form-container .spinner-cont {
+  display: none;
+  margin-top: 20px;
+  justify-content: center;
+  width: 100%;
+  background-color: #04a46e;
+  padding: 7px 0;
+  border-radius: 0.25rem;
+}
+.tracker-main-container .activity-container .cont.form-container .spinner-cont .loader {
+  width: 20px;
+  height: 20px;
+  border: 3px solid #083325;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 .tracker-main-container .time-entry-container {
   width: 100%;
-  height: 200px;
   margin-top: 20px;
 }
 .tracker-main-container .time-entry-container .time-entry-header {
   display: flex;
   justify-content: space-between;
+  margin-bottom: 20px;
 }
 .tracker-main-container .time-entry-container .time-entry-header i {
   cursor: pointer;
 }
 .tracker-main-container .time-entry-container .time-entry-header i:hover {
   color: #00bc7d;
+}
+.tracker-main-container .time-entry-container .instance {
+  border: 1px solid #303030;
+  border-radius: 10px;
+  padding: 20px;
+}
+.tracker-main-container .time-entry-container .instance .title {
+  display: flex;
+  justify-content: space-between;
+}
+.tracker-main-container .time-entry-container .instance .title .action {
+  display: flex;
+  gap: 7px;
+}
+.tracker-main-container .time-entry-container .instance .title .action div {
+  padding: 5px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.tracker-main-container .time-entry-container .instance .title .action div:hover {
+  opacity: 70%;
+}
+.tracker-main-container .time-entry-container .instance .title .action div i {
+  font-size: 13px;
+}
+.tracker-main-container .time-entry-container .instance .title .action .edit {
+  background-color: #007bff;
+}
+.tracker-main-container .time-entry-container .instance .title .action .delete {
+  background-color: #DC4C64;
+}
+.tracker-main-container .time-entry-container .instance .time {
+  display: flex;
+  gap: 17px;
+  margin-top: 15px;
+  flex-wrap: wrap;
+}
+.tracker-main-container .time-entry-container .instance .total-hours {
+  margin-top: 13px;
+  font-size: 17px;
+  font-weight: bold;
 }
 
 footer {
@@ -405,10 +480,6 @@ body.light-mode .cont {
   border: 1px solid #dee2e6 !important;
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
 }
-body.light-mode .cont button {
-  color: black !important;
-  cursor: pointer;
-}
 body.light-mode .cont:hover .logout-btn {
   color: #0d6efd !important;
 }
@@ -417,6 +488,13 @@ body.light-mode .cont .progress-circle-bg {
 }
 body.light-mode .cont .progress-bar-bg {
   background-color: #d6f5dd !important;
+}
+body.light-mode .cont .action i {
+  color: white !important;
+}
+body.light-mode .instance {
+  border: 1px solid #dee2e6 !important;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
 }
 body.light-mode .input {
   background-color: white !important;

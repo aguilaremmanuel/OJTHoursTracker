@@ -1,0 +1,523 @@
+<div class="request-form">
+
+    <!--
+    <label>Tenant's Name: <span class="asterisk">*</span>
+    [text* text-800 class:name-input]</label> 
+    -->
+  
+    <div class="tenants-info">
+        <div>
+            <label>Tenant's Name: <span class="asterisk">*</span>
+                [text* text-800 class:name-input]</label> 
+        </div>
+        <div>
+            <label>Email: <span class="asterisk">*</span></label>
+            [email* email-606 autocomplete:email]
+        </div>
+    </div>
+
+    <div class='room-info'>
+        <div>
+           <label>Room No.: <span class="asterisk">*</span>
+           [text* text-265 class:room-no-input]</label>
+        </div>
+  
+        <div>
+           <label>Bed No.: <span class="asterisk">*</span>
+           [text* text-382 class:bed-no-input]</label>
+        </div>
+    </div>
+  
+    <p class="p-label">Repair/Maintenance/Replacement Request Services Checklist <span class="asterisk">*</span></p>
+  
+    <div class="checklist-container">
+        <div class="services">
+            <div class="service-header">
+                <span class='service-title'>INSTALLATION/REPAIR WORKS</span>
+                <i class="fa-solid fa-angle-right accordion-icon"></i>
+            </div>
+
+            <div class="pricelist">
+
+                <div class="installation">
+
+                    <div class="table-head">
+                        <span>INSTALLTION / LABOR WORK</span>
+                        <span>RATE</span>
+                    </div>
+
+                    <div class="service-instance">
+                        [checkbox installation-installation class:checkbox-input "DRILLING WORKS"]
+
+                        <div class="price"> 250.00/SET</div>
+                    </div>
+
+                    <div class="service-instance">
+                        [checkbox installation-installation class:checkbox-input "LENOLIUM"]
+                        <div class="price">₱ 1,000.00</div>
+                    </div>
+
+                    <div class="service-instance">
+                        <div class="service-checkbox">
+                            [checkbox installation-installation class:checkbox-input "ADDITIONAL LOCKSET"]
+                        </div>
+                        <div class="price">₱ 340.00</div>
+                    </div>
+
+                    <div class="service-instance">
+                        <div class="service-checkbox">
+                            [checkbox installation-installation class:checkbox-input "EXHAUST FAN"]
+                        </div>
+                        <div class="price">₱ 650.00</div>
+                    </div>
+
+                    <div class="service-instance">
+                        <div class="service-checkbox">
+                            [checkbox installation-installation class:checkbox-input "CURTAIN BLINDS"]
+                        </div>
+                        <div class="price">₱ 2,500.00</div>
+                    </div> 
+
+                </div>
+
+                <div class="replacement">
+
+                    <div class="table-head">
+                        <span>REPLACEMENT / REPAIR</span>
+                        <span>RATE</span>
+                    </div>
+
+                    <div class="service-instance">
+                        <div class="service-checkbox">
+                            [checkbox installation-repair class:checkbox-input "MAIN DOOR LOCK SET"]
+                        </div>
+                        <div class="price">₱ 250.00</div>
+                    </div>
+
+                    <div class="service-instance">
+                        <div class="service-checkbox">
+                            [checkbox installation-repair class:checkbox-input "MAIN DOOR KNOB"]
+                        </div>
+                        <div class="price">₱ 450.00</div>
+                    </div>
+
+                    <div class="service-instance">
+                        <div class="service-checkbox">
+                            [checkbox installation-repair class:checkbox-input "TOILET DOOR KNOB"]
+                        </div>
+                        <div class="price">₱ 300.00</div>
+                    </div>
+
+                    <div class="service-instance">
+                        <div class="service-checkbox">
+                            [checkbox installation-repair class:checkbox-input "SHOWER DOOR HINGE"]
+                        </div>
+                        <div class="price">₱ 350.00</div>
+                    </div>
+
+                    <div class="service-instance">
+                        <div class="service-checkbox">
+                            [checkbox installation-repair class:checkbox-input "EXHAUST FAN"]
+                        </div>
+                        <div class="price">₱ 600.00</div>
+                    </div>
+
+                    <div class="service-instance">
+                        <div class="service-checkbox">
+                            [checkbox installation-repair class:checkbox-input "LINOLIUM WHOLE ROOM"]
+                        </div>
+                        <div class="price">₱ 1,500.00</div>
+                    </div>
+
+                    <div class="service-instance">
+                        <div class="service-checkbox">
+                            [checkbox installation-repair class:checkbox-input "PLASTERING OF AC SIDES"]
+                        </div>
+                        <div class="price">₱ 560.00</div>
+                    </div>
+
+                    <div class="service-instance">
+                        <div class="service-checkbox">
+                            [checkbox installation-repair class:checkbox-input "WATER PROOFING OF WINDOW SEAL"]
+                        </div>
+                        <div class="price">₱ 700.00</div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+  
+        <div class="services">
+          <div class="service-header">
+            <span class='service-title'>ELECTRICAL WORKS</span>
+            <i class="fa-solid fa-angle-right accordion-icon"></i>
+          </div>
+            
+          <div class="pricelist">
+            <div class="installation">
+
+                <div class="table-head">
+                    <span>INSTALLTION / LABOR WORK</span>
+                    <span>RATE</span>
+                </div>
+
+                <div class="service-instance">
+                    [checkbox electrical-installation class:checkbox-input "CIRCUIT BREAKER"]
+                    <div class="price">₱ 700.00/PC</div>
+                </div>
+
+                <div class="service-instance">
+                    [checkbox electrical-installation class:checkbox-input "OUTLET/SWITCH"]
+                    <div class="price">₱ 250.00</div>
+                </div>
+
+                <div class="service-instance">
+                    <div class="service-checkbox">
+                        [checkbox electrical-installation class:checkbox-input "SMOKE DETECTOR"]
+                    </div>
+                    <div class="price">₱ 550/SET.00</div>
+                </div>
+
+                <div class="service-instance">
+                    <div class="service-checkbox">
+                        [checkbox electrical-installation class:checkbox-input "ADDITIONAL ELECTRICAL WIRING"]
+                    </div>
+                    <div class="price">₱ 150/METER.00</div>
+                </div>
+
+            </div>
+      
+            <div class="replacement">
+
+                <div class="table-head">
+                    <span>REPLACEMENT / REPAIR</span>
+                    <span>RATE</span>
+                </div>
+
+                <div class="service-instance">
+                    <div class="service-checkbox">
+                        [checkbox electrical-repair class:checkbox-input "BULB"]
+                    </div>
+                    <div class="price">₱ 150.00/PC</div>
+                </div>
+
+                <div class="service-instance">
+                    <div class="service-checkbox">
+                        [checkbox electrical-repair class:checkbox-input "CIRCULAR BED LIGHT"]
+                    </div>
+                    <div class="price">₱ 350.00/PC</div>
+                </div>
+
+                <div class="service-instance">
+                    <div class="service-checkbox">
+                        [checkbox electrical-repair class:checkbox-input "STUDY LIGHT"]
+                    </div>
+                    <div class="price">₱ 290.00/PC</div>
+                </div>
+
+                <div class="service-instance">
+                    <div class="service-checkbox">
+                        [checkbox electrical-repair class:checkbox-input "TOILET LIGHT"]
+                    </div>
+                    <div class="price">₱ 290.00/PC</div>
+                </div>
+
+                <div class="service-instance">
+                    <div class="service-checkbox">
+                        [checkbox electrical-repair class:checkbox-input "KITCHEN LIGHT"]
+                    </div>
+                    <div class="price">₱ 290.00/PC</div>
+                </div>
+
+                <div class="service-instance">
+                    <div class="service-checkbox">
+                        [checkbox electrical-repair class:checkbox-input "TROUBLESHOOTONG ELECTRICAL WIRING  AND DEVICES"]
+                    </div>
+                    <div class="price">₱ 290.00/PC</div>
+                </div>
+
+        
+            </div>
+          </div>
+
+        </div>
+  
+        <div class="services">
+          <div class="service-header">
+            <span class='service-title'>PLUMMING WORKS</span>
+            <i class="fa-solid fa-angle-right accordion-icon"></i>
+          </div>
+
+          <div class="pricelist">
+            <div class="installation">
+
+                <div class="table-head">
+                    <span>INSTALLTION / LABOR WORK</span>
+                    <span>RATE</span>
+                </div>
+
+                <div class="service-instance">
+                    [checkbox plumming-installation class:checkbox-input "BIDET"]
+                    <div class="price">₱ 750.00</div>
+                </div>
+
+                <div class="service-instance">
+                    [checkbox plumming-installation class:checkbox-input "GREASE TRAP"]
+                    <div class="price">₱ 1500.00</div>
+                </div>
+
+                <div class="service-instance">
+                    <div class="service-checkbox">
+                        [checkbox plumming-installation class:checkbox-input "P-TRAP REPLACEMENT"]
+                    </div>
+                    <div class="price">₱ 650.00</div>
+                </div>
+
+                <div class="service-instance">
+                    <div class="service-checkbox">
+                        [checkbox plumming-installation class:checkbox-input "GREASE TRAP CLEANING"]
+                    </div>
+                    <div class="price">₱ 850.00</div>
+                </div>
+
+                <div class="service-instance">
+                    <div class="service-checkbox">
+                        [checkbox plumming-installation class:checkbox-input "DECLOGGING OF P-TRAP/SINK/LAVATORY"]
+                    </div>
+                    <div class="price">₱ 1,500.00</div>
+                </div>
+
+                <div class="service-instance">
+                    <div class="service-checkbox">
+                        [checkbox plumming-installation class:checkbox-input "DECLOGGING OF CLEAN OUT"]
+                    </div>
+                    <div class="price">₱ 6,500.00</div>
+                </div>
+        
+                <div class="service-instance">
+                    <div class="service-checkbox">
+                        [checkbox plumming-installation class:checkbox-input "REPAIR OF SANITARY PIPE LEAK"]
+                    </div>
+                    <div class="price">₱ 6,500.00</div>
+                </div>
+
+            </div>
+      
+            <div class="replacement">
+
+                <div class="table-head">
+                    <span>REPLACEMENT / REPAIR</span>
+                    <span>RATE</span>
+                </div>
+
+                <div class="service-instance">
+                    <div class="service-checkbox">
+                        [checkbox plumming-repair class:checkbox-input "BIDET WITH HOSE"]
+                    </div>
+                    <div class="price">₱ 900.00/PC</div>
+                </div>
+
+                <div class="service-instance">
+                    <div class="service-checkbox">
+                        [checkbox plumming-repair class:checkbox-input "FAUCET"]
+                    </div>
+                    <div class="price">₱ 500.00/PC</div>
+                </div>
+
+                <div class="service-instance">
+                    <div class="service-checkbox">
+                        [checkbox plumming-repair class:checkbox-input "SHOWER HEAD"]
+                    </div>
+                    <div class="price">₱ 900.00/PC</div>
+                </div>
+
+                <div class="service-instance">
+                    <div class="service-checkbox">
+                        [checkbox plumming-repair class:checkbox-input "SHOWER HANDLE"]
+                    </div>
+                    <div class="price">₱ 1,300.00/PC</div>
+                </div>
+
+                <div class="service-instance">
+                    <div class="service-checkbox">
+                        [checkbox plumming-repair class:checkbox-input "SHOWER VALVE"]
+                    </div>
+                    <div class="price">₱ 900.00/PC</div>
+                </div>
+
+                <div class="service-instance">
+                    <div class="service-checkbox">
+                        [checkbox plumming-repair class:checkbox-input "ANGLE VALVE"]
+                    </div>
+                    <div class="price">₱ 300.00/PC</div>
+                </div>
+
+                <div class="service-instance">
+                    <div class="service-checkbox">
+                        [checkbox plumming-repair class:checkbox-input " WATER FLUSHER SYSTEM"]
+                    </div>
+                    <div class="price">₱ 1,500.00/PC</div>
+                </div>
+
+                <div class="service-instance">
+                    <div class="service-checkbox">
+                        [checkbox plumming-repair class:checkbox-input "TOILET BOWL REPLACEMENT"]
+                    </div>
+                    <div class="price">₱ 6,500.00/PC</div>
+                </div>
+
+                <div class="service-instance">
+                    <div class="service-checkbox">
+                        [checkbox plumming-repair class:checkbox-input "WATERLINE OUTLET"]
+                    </div>
+                    <div class="price">₱ 560.00/PC</div>
+                </div>
+
+                <div class="service-instance">
+                    <div class="service-checkbox">
+                        [checkbox plumming-repair class:checkbox-input "TILE RE-GROUTING"]
+                    </div>
+                    <div class="price">₱ 350.00/PC</div>
+                </div>
+
+                <div class="service-instance">
+                    <div class="service-checkbox">
+                        [checkbox plumming-repair class:checkbox-input "TOILET COVER REPLACEMENT"]
+                    </div>
+                    <div class="price">₱ 450.00/PC</div>
+                </div>
+        
+            </div>
+          </div>
+
+        </div>
+  
+        <div class="services">
+            <div class="service-header">
+                <span class='service-title'>OTHER SERVICES</span>
+                <i class="fa-solid fa-angle-right accordion-icon"></i>
+            </div>
+
+            <div class="pricelist">
+                <div class="installation">
+
+                    <div class="table-head">
+                        <span>INSTALLTION / LABOR WORK</span>
+                        <span>RATE</span>
+                    </div>
+
+                    <div class="service-instance">
+                        [checkbox other-installation class:checkbox-input "ACU INSTALLATION"]
+                        <div class="price">₱ 750.00</div>
+                    </div>
+
+                    <div class="service-instance">
+                        [checkbox other-installation class:checkbox-input "ACU (WITH OPENING ADJUSTMENT)"]
+                        <div class="price">₱ 2,500.00</div>
+                    </div>
+
+                    <div class="service-instance">
+                        <div class="service-checkbox">
+                            [checkbox other-installation class:checkbox-input "ACU DRAIN PIPE"]
+                        </div>
+                        <div class="price">₱ 675.00</div>
+                    </div>
+
+                    <div class="service-instance">
+                        <div class="service-checkbox">
+                            [checkbox other-installation class:checkbox-input "ACU OPENING RESTORATION / RE-OPENING"]
+                        </div>
+                        <div class="price">₱ 1,500.00</div>
+                    </div>
+
+                    <div class="service-instance">
+                        <div class="service-checkbox">
+                            [checkbox other-installation class:checkbox-input "SMOKE DETECTOR CLEANING"]
+                        </div>
+                        <div class="price">₱ 6,500.00</div>
+                    </div>
+
+                </div>
+    
+                <div class="replacement">
+
+                    <div class="table-head">
+                        <span>REPLACEMENT / REPAIR</span>
+                        <span>RATE</span>
+                    </div>
+
+                    <div class="service-instance">
+                        <div class="service-checkbox">
+                            [checkbox other-repair class:checkbox-input "ACU CLEANING"]
+                        </div>
+                        <div class="price">₱ 1,500.00/PC</div>
+                    </div>
+
+                    <div class="service-instance">
+                        <div class="service-checkbox">
+                            [checkbox other-repair class:checkbox-input "ELECTRICAL PANEL CLEANING AND RETIGHTENING"]
+                        </div>
+                        <div class="price">₱ 1,500.00/SET</div>
+                    </div>
+
+                    <div class="service-instance">
+                        <div class="service-checkbox">
+                            [checkbox other-repair class:checkbox-input "EXHAUST FAN CLEANING"]
+                        </div>
+                        <div class="price">₱ 600.00/UNIT</div>
+                    </div>
+
+                    <div class="service-instance">
+                        <div class="service-checkbox">
+                            [checkbox other-repair class:checkbox-input "ROOM CLEANING"]
+                        </div>
+                        <div class="price">TBD</div>
+                    </div>
+
+                    <div class="service-instance">
+                        <div class="service-checkbox">
+                            [checkbox other-repair class:checkbox-input "CURTAIN LAUNDRY"]
+                        </div>
+                        <div class="price">₱ 300.00/KL</div>
+                    </div>
+       
+                </div>
+            </div>
+        </div>
+    </div>
+  
+    <p class="p-label"> Select Date and Time <span class="asterisk">*</span></p>
+
+    <div class="date-time-container">
+        <div class="date-container">
+            <p style="font-weight: 600;">Booking Date</p>
+            [uacf7_booking_form_date* uacf7_booking_form_date-629]
+        </div>
+        <div class="time-container">
+            <p style="font-weight: 600;">Booking Time</p>
+            [uacf7_booking_form_time* uacf7_booking_form_time-699]
+        </div>
+    </div>
+
+    <div class="summary">
+         <hr>
+        <div class="summary-container">
+            <div class="summary-title">ORDER SUMMARY</div>
+            <div class="orders">
+                <div class="orders-title"><span>SERVICES</span><span>AMOUNT</span></div>
+                <!-- <div class="order"><span>DRILLING WORKS</span><span>200.00</span></div> -->
+            </div>
+            <div class="subtotal"><span>SUBTOTAL</span><span id="subtotal">0.00</span></div>
+        </div>
+    </div>
+
+    <div class="recaptcha">
+        [recaptcha]
+    </div>
+      
+    <div class="submit-btn-container">
+        [submit class:submit-btn "SUBMIT REQUEST"]
+    </div>
+
+  </div>

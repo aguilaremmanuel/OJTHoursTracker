@@ -90,37 +90,42 @@
             </div>
 
             <div class="cont form-container">
-                <h3>Record Time Entry</h3>
-                <label for="date"><i class="fa-regular fa-calendar"></i> Date</label>
-                <input type="date" class="input date-input" name="date">
-                <div class="time">
-                    <label for=""><i class="fa-regular fa-clock"></i> Morning</label>
-                    <div class="time-container">
-                        <input class="input time-input" type="time" name="time">
-                        <input class="input time-input" type="time" name="time">
-                        <p>Time In</p>
-                        <p>Time Out</p>
+                <form id="timeEntryForm" action="" method="POST">
+                    <h3>Record Time Entry</h3>
+                    <label for="date"><i class="fa-regular fa-calendar"></i> Date</label>
+                    <input type="date" class="input date-input" name="date">
+                    <div class="time">
+                        <label for=""><i class="fa-regular fa-clock"></i> Morning</label>
+                        <div class="time-container">
+                            <input class="input time-input" type="time" name="time">
+                            <input class="input time-input" type="time" name="time">
+                            <p>Time In</p>
+                            <p>Time Out</p>
+                        </div>
                     </div>
-                </div>
-                <div class="time">
-                    <label for=""><i class="fa-regular fa-clock"></i> Afternoon</label>
-                    <div class="time-container">
-                        <input class="input time-input" type="time" name="time">
-                        <input class="input time-input" type="time" name="time">
-                        <p>Time In</p>
-                        <p>Time Out</p>
+                    <div class="time">
+                        <label for=""><i class="fa-regular fa-clock"></i> Afternoon</label>
+                        <div class="time-container">
+                            <input class="input time-input" type="time" name="time">
+                            <input class="input time-input" type="time" name="time">
+                            <p>Time In</p>
+                            <p>Time Out</p>
+                        </div>
                     </div>
-                </div>
-                <div class="time">
-                    <label for=""><i class="fa-regular fa-clock"></i> Evening (Optional)</label>
-                    <div class="time-container">
-                        <input class="input time-input" type="time" name="time">
-                        <input class="input time-input" type="time" name="time">
-                        <p>Time In</p>
-                        <p>Time Out</p>
+                    <div class="time">
+                        <label for=""><i class="fa-regular fa-clock"></i> Evening (Optional)</label>
+                        <div class="time-container">
+                            <input class="input time-input" type="time" name="time">
+                            <input class="input time-input" type="time" name="time">
+                            <p>Time In</p>
+                            <p>Time Out</p>
+                        </div>
                     </div>
-                </div>
-                <button type="button">Add Time Entry</button>
+                    <button id="addTimeEntryBtn" type="button" disabled>Add Time Entry</button>
+                    <div class="spinner-cont">
+                        <span class="loader"></span>
+                    </div>
+                </form>
             </div>
 
         </div>
@@ -134,24 +139,44 @@
                 </div>
             </div>
 
-            <div>
+            <div class="instance">
                 <div class="title">
                     <h3>Monday, April 14, 2025</h3>
                     <div class="action">
-                        <div class="edit"></div>
-                        <div class="delete"></div>
+                        <div class="edit"><i class="fa-solid fa-pen-to-square"></i></div>
+                        <div class="delete"><i class="fa-solid fa-trash"></i></div>
                     </div>
                 </div>
+                <div class="time">
+                    <p>Morning: 10:00 - 12:00 <span>(2.00 hours)</span></p> 
+                    <p>Afternoon: 13:00 - 18:00 <span>(5.00 hours)</span></p>
+                    <p>Evening: 18:00 - 19:00 <span>(1.00 hour)</span></p>
+                </div>
+                <p class="total-hours">Total Hours: 8.00</p>
             </div>
         </div>
     </div>
-
-
 
     {% if not user.is_authenticated %}
         <script>window.location.href = "/";</script>
     {% endif %}
     <script>
+
+        function getCookie(name) {
+
+            let cookieValue = null;
+
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let cookie of cookies) {
+                    if (cookie.trim().startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.trim().substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
 
         function updateProgress(percent) {
             const circle = document.querySelector('.progress-circle-fill');
@@ -165,6 +190,7 @@
             circle.style.strokeDashoffset = offset;
             percentElement.textContent = percent + '%';
         }
+
         document.addEventListener('DOMContentLoaded', function () {
 
             updateProgress(70);
@@ -182,26 +208,99 @@
             });
 
             document.addEventListener('click', function (e) {
-            if (!profile.contains(e.target) && !logoutBtn.contains(e.target)) {
-                logoutBtn.classList.remove('show');
-            }
+                if (!profile.contains(e.target) && !logoutBtn.contains(e.target)) {
+                    logoutBtn.classList.remove('show');
+                }
             });
+
+            const dateInput = document.querySelector('input[name="date"]');
+            const addTimeEntryBtn = document.getElementById('addTimeEntryBtn');
+            const timeEntryForm = document.getElementById('timeEntryForm');
+
+            function validateForm() {
+                const dateFilled = dateInput.value.trim() !== '';
+
+                // Group time inputs into sets of two (Time In, Time Out)
+                const timeContainers = document.querySelectorAll('.time-container');
+                let atLeastOneCompletePair = false;
+
+                timeContainers.forEach(container => {
+                    const times = container.querySelectorAll('input[type="time"]');
+                    if (times.length === 2) {
+                        const timeIn = times[0].value.trim();
+                        const timeOut = times[1].value.trim();
+                        if (timeIn !== '' && timeOut !== '') {
+                            atLeastOneCompletePair = true;
+                        }
+                    }
+                });
+
+                addTimeEntryBtn.disabled = !(dateFilled && atLeastOneCompletePair);
+
+                if(dateFilled && atLeastOneCompletePair) {
+                    addTimeEntryBtn.style = 'opacity: 100%! important';
+                }
+            }
+
+            // Attach listener to all time inputs and the date input
+            document.querySelectorAll('input[type="time"], input[name="date"]').forEach(input => {
+                input.addEventListener('input', validateForm);
+            });
+
+            // Initial check
+            validateForm();
+
+            addTimeEntryBtn.addEventListener('click', function() {
+
+                const spinnerCont = document.querySelector('.spinner-cont');
+                addTimeEntryBtn.style.display = 'none';
+                spinnerCont.style.display = 'flex';
+
+                const formData = new FormData(timeEntryForm);
+
+                const timeFields = timeEntryForm.querySelectorAll('input[type="time"]');
+                const payload = {
+                    date: formData.get('date'),
+                    morning_in: timeFields[0].value || null,
+                    morning_out: timeFields[1].value || null,
+                    afternoon_in: timeFields[2].value || null,
+                    afternoon_out: timeFields[3].value || null,
+                    evening_in: timeFields[4].value || null,
+                    evening_out: timeFields[5].value || null
+                };
+
+                fetch('/api/time-entry/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify(payload)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.message) {
+                        console.log(data.message);
+                        timeEntryForm.reset();
+                        setTimeout(() => {
+                            addTimeEntryBtn.style.display = 'block';
+                            spinnerCont.style.display = 'none';
+                        }, 1000);
+
+                    } else {
+                        console.error(data);
+                        alert('Failed to record time entry.');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Something went wrong.');
+                });
+
+            });
+
         });
-        /*
-        const theme = localStorage.getItem('theme') || 'auto';
-        alert(theme);
-        
-        document.body.classList.add(`${theme}-mode`);
-        
-        document.getElementById('theme-toggle').value = theme;
-      
-        document.getElementById('theme-toggle').addEventListener('change', (e) => {
-          const newTheme = e.target.value;
-          document.body.classList.remove('light-mode', 'dark-mode', 'auto-mode');
-          document.body.classList.add(`${newTheme}-mode`);
-          localStorage.setItem('theme', newTheme);
-        });
-        */
+
       </script>
 </body>
 </html>

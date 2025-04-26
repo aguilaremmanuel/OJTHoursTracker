@@ -66,6 +66,9 @@ input[type="date"]::-webkit-calendar-picker-indicator,
 input[type="time"]::-webkit-calendar-picker-indicator {
     filter: invert(1);
     cursor: pointer;
+    color: #c6c5c5;
+    color: #d9d4d4;
+    color: #6a0007;
 }
 
 .input {
@@ -419,6 +422,7 @@ body {
 
             &.form-container {
                 .date-input {
+                    width: 100%;
                     color: white;
                     background-color: rgb(113, 113, 113);
                 }
@@ -444,6 +448,7 @@ body {
                 }
 
                 button {
+                    width: 100%;
                     margin-top: 20px;
                     padding: 10px 0;
                     background-color: $success-color;
@@ -452,10 +457,44 @@ body {
                     font-size: 16px;
                     border-radius: 0.25rem;
                     cursor: pointer;
+                    opacity: 50%;
+                    color: white;
 
                     &:hover {
                         background-color: #04a46e;
                     }
+
+                }
+
+                .spinner-cont {
+
+                    display: none;
+                    margin-top: 20px;
+                    justify-content: center;
+                    width: 100%;
+                    background-color: #04a46e;
+                    padding: 7px 0;
+                    border-radius: 0.25rem;
+
+                    .loader {
+                        width: 20px;
+                        height: 20px;
+                        border: 3px solid #083325;
+                        border-bottom-color: transparent;
+                        border-radius: 50%;
+                        display: inline-block;
+                        box-sizing: border-box;
+                        animation: rotation 1s linear infinite;
+                        }
+                    
+                        @keyframes rotation {
+                        0% {
+                            transform: rotate(0deg);
+                        }
+                        100% {
+                            transform: rotate(360deg);
+                        }
+                    } 
 
                 }
             }
@@ -465,12 +504,12 @@ body {
 
     .time-entry-container {
         width: 100%;
-        height: 200px;
         margin-top: 20px;
 
         .time-entry-header {
             display: flex;
             justify-content: space-between;
+            margin-bottom: 20px;
 
             i {
                 cursor: pointer;
@@ -479,8 +518,58 @@ body {
                     color: $success-color;
                 }
             }
-
         }
+
+        .instance {
+            border: 1px solid #303030;
+            border-radius: 10px;
+            padding: 20px;
+            
+
+            .title {
+                display: flex;
+                justify-content: space-between;
+                .action {
+                    display: flex;
+                    gap: 7px;
+                    div {
+                        padding: 5px 8px;
+                        border-radius: 3px;
+                        cursor: pointer;
+    
+                        &:hover {
+                            opacity: 70%;
+                        }
+    
+                        i {
+                            font-size: 13px;
+                        }
+                    
+                    }
+                    .edit {
+                        background-color: #007bff;
+                    }
+                    .delete {
+                        background-color: #DC4C64;
+                    }
+                }
+            }
+
+            .time {
+                display: flex;
+                gap: 17px;
+                margin-top: 15px;
+                flex-wrap: wrap;
+            }
+
+            .total-hours {
+                margin-top: 13px;
+                font-size: 17px;
+                font-weight: bold;
+            }
+        }
+
+
     }
 }   
 
@@ -512,11 +601,6 @@ body.light-mode {
         border: 1px solid #dee2e6 !important;
         box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
 
-        button {
-            color: $light-text !important;
-            cursor: pointer;
-        }
-
         &:hover .logout-btn {
             color: $primary-color !important;
         }
@@ -529,6 +613,15 @@ body.light-mode {
             background-color: #d6f5dd !important;
         }
 
+        .action i {
+            color: white !important;
+        }
+
+    }
+
+    .instance {
+        border: 1px solid #dee2e6 !important;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
     }
 
     .input {

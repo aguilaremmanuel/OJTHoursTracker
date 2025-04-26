@@ -9,4 +9,5 @@ urlpatterns = [
     path('auth/', include('social_django.urls', namespace='social')),
     path('logout/', views.logout, name='logout'),
     path('test/', views.test),
+    path('api/time-entry/', views.TimeEntryView.as_view(), name='time-entry'),
 ]

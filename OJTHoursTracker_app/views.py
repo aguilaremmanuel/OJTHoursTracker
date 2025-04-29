@@ -1,13 +1,15 @@
 from django.shortcuts import render, redirect
+from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout as auth_logout
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_http_methods
 from django.views.decorators.cache import never_cache
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
 from .serializers import TimeEntrySerializer
 from .models import *
+from django.views.decorators.csrf import csrf_protect
 
 def google_signin(request):
 
@@ -82,6 +84,29 @@ class TimeEntryListView(APIView):
         time_entries = TimeEntry.objects.filter(user_id=id)
         serializer = TimeEntrySerializer(time_entries, many=True)
         return Response(serializer.data)
+    
+@csrf_protect
+@require_http_methods(["DELETE"])
+def delete_time_entry(request, no):
+    try:
+        time_entry = TimeEntry.objects.get(no=no)
+
+        # Subtract the time entry's hours from the user's rendered_hours
+        if time_entry.user and time_entry.total_hours:
+            user = time_entry.user
+            user.rendered_hours = (user.rendered_hours or 0) - time_entry.total_hours
+            user.save()
+
+        time_entry.delete()
+
+        return JsonResponse({
+            'message': 'Deleted successfully',
+            'rendered_hours': user.rendered_hours,
+            'required_hours': user.required_hours
+        }, status=200)
+
+    except TimeEntry.DoesNotExist:
+        return JsonResponse({'error': 'Not found'}, status=404)
 
 def test(request):
     return render(request, 'test.html')

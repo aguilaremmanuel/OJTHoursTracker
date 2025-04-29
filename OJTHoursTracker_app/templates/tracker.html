@@ -163,7 +163,7 @@
             </div>
             <div class="popover-action">
                 <button class="cancel-btn" id="deletePopoverCancelBtn">Cancel</button>
-                <button class="delete-btn">Delete</button>
+                <button class="delete-btn" id="deleteBtn">Delete</button>
             </div>
         </div>
     </div>
@@ -172,8 +172,18 @@
         <script>window.location.href = "/";</script>
     {% endif %}
     <script>
-
+        const renderedHoursDisplay = document.getElementById('renderedHoursDisplay');
         const deletePopover = document.getElementById("deletePopover");
+        let selectedInstance = null;
+
+        const notyf = new Notyf({
+            duration: 3000, // Auto-close after 3 seconds
+            position: { x: "right", y: "bottom" }, // 📌 Lower-left position
+            dismissible: true, // Allow manual close
+            ripple: true, // Add ripple effect
+        });
+
+        const timeEntriesContainer = document.querySelector('.time-entry-instance-container');
 
         function getCookie(name) {
 
@@ -245,11 +255,8 @@
             .then(res => res.json())
             .then(data => {
 
-                console.log("User Time Entries: ", data);
-                
                 if (data && data.length > 0) {
-                    // Handle displaying the time entries
-                    const timeEntriesContainer = document.querySelector('.time-entry-instance-container');
+                    
                     timeEntriesContainer.innerHTML = ''; // Clear previous entries
 
                     data.forEach(entry => {
@@ -322,7 +329,8 @@
                     deleteBtns.forEach(btn => {
                         btn.addEventListener('click', function() {
                             deletePopover.classList.add("show");
-                            const instanceNo = this.getAttribute('data-instance-no');
+                            //const instanceNo = this.getAttribute('data-instance-no');
+                            selectedInstance = this.getAttribute('data-instance-no');
                         });
                     });
 
@@ -344,6 +352,51 @@
                 deletePopover.classList.remove('show');
             });
 
+            const deleteBtn = document.getElementById('deleteBtn');
+
+            deleteBtn.onclick = function() {
+
+                if (selectedInstance) {
+
+                    deletePopover.classList.remove('show');
+                    
+                    fetch(`/delete-time-entry/${selectedInstance}/`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken'),
+                        },
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();  
+                        } else {
+                            throw new Error('Failed to delete the time entry.');
+                        }
+                    })
+                    .then(data => {
+
+                        updateTimeEntryDisplay("{{id}}");
+
+                        notyf.success("Time entry deleted successfully!");
+
+                        renderedHoursDisplay.textContent = data.rendered_hours;
+
+                        if (data.rendered_hours > data.required_hours) {
+                            updateProgress(100);
+                            progressBar.style.width = "100%";
+                        } else {
+                            let percentage = Math.round((data.rendered_hours / data.required_hours) * 100);
+                            updateProgress(percentage);
+                            progressBar.style.width = percentage + "%";
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+
+                    selectedInstance = null;
+                    
+                }
+            };
+
         }
         
         document.addEventListener('DOMContentLoaded', function () {
@@ -355,8 +408,6 @@
             let required_hours = parseFloat("{{required_hours}}");
             let rendered_hours = parseFloat("{{rendered_hours}}");
             const progressBar = document.querySelector('.progress-bar');
-
-            const renderedHoursDisplay = document.getElementById('renderedHoursDisplay');
 
             if(rendered_hours > required_hours) {
                 updateProgress(100);
@@ -422,13 +473,6 @@
             // Initial check
             validateForm();
 
-            const notyf = new Notyf({
-                duration: 3000, // Auto-close after 3 seconds
-                position: { x: "right", y: "bottom" }, // 📌 Lower-left position
-                dismissible: true, // Allow manual close
-                ripple: true, // Add ripple effect
-            });
-
             addTimeEntryBtn.addEventListener('click', function() {
 
                 const spinnerCont = document.querySelector('.spinner-cont');
@@ -464,22 +508,26 @@
                             addTimeEntryBtn.style.display = 'block';
                             spinnerCont.style.display = 'none';
                             timeEntryForm.reset();
+
+                            renderedHoursDisplay.textContent = data.rendered_hours;
+
+                            if(data.rendered_hours > data.required_hours) {
+                                updateProgress(100);
+                                progressBar.style.width = "100%";
+                            } else {
+                                let percentage = Math.round((data.rendered_hours / data.required_hours) * 100);
+                                updateProgress(percentage);
+                                progressBar.style.width = percentage+"%";
+                            }
+                            
+                            updateTimeEntryDisplay("{{id}}");
+
+                            notyf.success("Time entry added successfully!");
+                            
                         }, 2000);
                         
-                        renderedHoursDisplay.textContent = data.rendered_hours;
-
-                        if(data.rendered_hours > data.required_hours) {
-                            updateProgress(100);
-                            progressBar.style.width = "100%";
-                        } else {
-                            let percentage = Math.round((data.rendered_hours / data.required_hours) * 100);
-                            updateProgress(percentage);
-                            progressBar.style.width = percentage+"%";
-                        }
                         
-                        updateTimeEntryDisplay("{{id}}");
                         
-                        notyf.success("Time entry added successfully!");
                     } else {
                         console.error(data);
                         alert('Failed to record time entry.');
@@ -524,6 +572,8 @@
                     requiredHoursDisplay.textContent = Number.isInteger(newRequiredHours) 
                         ? newRequiredHours 
                         : newRequiredHours.toFixed(2);
+
+                    notyf.success("Required hours saved!");
 
                     console.log(data.message || data.error);
                 })

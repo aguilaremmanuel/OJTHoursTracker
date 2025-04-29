@@ -128,20 +128,6 @@ input[type=time]::-webkit-calendar-picker-indicator {
   box-shadow: 0 0 5px rgb(0, 162, 108);
 }
 
-/*
-.input.input-dark {
-    background-color: #222225;
-    color: white;
-    border: 1px solid #454545;
-}
-
-
-.input.input-light {
-    background-color: #222225 !important;
-    color: black !important;
-    border: 1px solid rgb(221, 221, 221) !important;
-}
-*/
 body {
   display: flex;
   justify-content: center;
@@ -576,6 +562,24 @@ footer a {
 body.light-mode {
   background-color: #e1e1e2 !important;
   color: black !important;
+}
+body.light-mode .checkbox-label {
+  background-color: #ffffff !important;
+}
+body.light-mode .checkbox-label .ball {
+  background-color: rgb(126, 124, 124) !important;
+}
+body.light-mode .popover-content {
+  background-color: #ffffff !important;
+  color: black !important;
+  border: 1px solid #dee2e6 !important;
+}
+body.light-mode .popover-content .cancel-btn {
+  background-color: #ffffff !important;
+  color: black !important;
+}
+body.light-mode .popover-content .cancel-btn:hover {
+  color: #0d6efd !important;
 }
 body.light-mode .cont {
   background-color: #ffffff !important;

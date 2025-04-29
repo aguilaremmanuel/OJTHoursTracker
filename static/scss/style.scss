@@ -172,22 +172,6 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     }
 }
 
-
-/*
-.input.input-dark {
-    background-color: #222225;
-    color: white;
-    border: 1px solid #454545;
-}
-
-
-.input.input-light {
-    background-color: #222225 !important;
-    color: black !important;
-    border: 1px solid rgb(221, 221, 221) !important;
-}
-*/
-
 body {
     display: flex;
     justify-content: center;
@@ -692,8 +676,6 @@ body {
     }
 }   
 
-
-
 footer {
     width: 100%;
     padding: 20px;
@@ -706,13 +688,35 @@ footer {
     a {
         text-decoration: underline;
     }
-
 }
 
 
 body.light-mode {
-    background-color: #e1e1e2!important;
+    background-color: #e1e1e2 !important;
     color: $light-text !important;
+
+    .checkbox-label {
+        background-color: $light-bg !important;
+
+        .ball {
+            background-color: rgb(126, 124, 124) !important;
+        }
+
+    }
+
+    .popover-content {
+        background-color: $light-bg !important;
+        color: $light-text !important;
+        border: 1px solid #dee2e6 !important;
+
+        .cancel-btn {
+            background-color: $light-bg !important;
+            color: $light-text !important;
+            &:hover {
+                color: $primary-color !important;
+            }
+        }
+    }
 
     .cont {
         background-color: $light-bg !important;

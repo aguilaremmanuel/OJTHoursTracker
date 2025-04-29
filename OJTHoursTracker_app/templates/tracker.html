@@ -156,13 +156,13 @@
         </div>
     </div>
 
-    <div class="popover" id="popover">
+    <div class="popover" id="deletePopover">
         <div class="popover-content">
             <div class="popover-message">
                 <p>Are you sure you want to delete this entry?</p>
             </div>
             <div class="popover-action">
-                <button class="cancel-btn">Cancel</button>
+                <button class="cancel-btn" id="deletePopoverCancelBtn">Cancel</button>
                 <button class="delete-btn">Delete</button>
             </div>
         </div>
@@ -173,7 +173,7 @@
     {% endif %}
     <script>
 
-        const popover = document.getElementById("popover");
+        const deletePopover = document.getElementById("deletePopover");
 
         function getCookie(name) {
 
@@ -321,7 +321,7 @@
                     const deleteBtns = document.querySelectorAll('.delete');
                     deleteBtns.forEach(btn => {
                         btn.addEventListener('click', function() {
-                            popover.classList.add("show");
+                            deletePopover.classList.add("show");
                             const instanceNo = this.getAttribute('data-instance-no');
                         });
                     });
@@ -337,9 +337,20 @@
             });
         }
 
+        function popOvers() {
+
+            const deletePopoverCancelBtn = document.getElementById('deletePopoverCancelBtn');
+            deletePopoverCancelBtn.addEventListener('click', function() {
+                deletePopover.classList.remove('show');
+            });
+
+        }
+        
         document.addEventListener('DOMContentLoaded', function () {
 
             updateTimeEntryDisplay("{{id}}");
+
+            popOvers();
 
             let required_hours = parseFloat("{{required_hours}}");
             let rendered_hours = parseFloat("{{rendered_hours}}");

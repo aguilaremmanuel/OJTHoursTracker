@@ -32,6 +32,77 @@ a {
   font-family: "League Spartan", sans-serif;
 }
 
+.popover {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.popover.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.popover-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 420px;
+  height: 170px;
+  background-color: #18181B;
+  border: 1px solid #303030;
+  padding: 20px 25px;
+  border-radius: 8px;
+  transform: translateY(-30px);
+  transition: transform 0.3s ease;
+  margin-top: 50px;
+}
+.popover-content .popover-message {
+  margin-top: 20px;
+}
+.popover-content p {
+  font-size: 18px;
+}
+.popover-content .popover-action {
+  display: flex;
+  justify-content: end;
+  gap: 2px;
+}
+.popover-content .popover-action button {
+  cursor: pointer;
+  font-size: 16px;
+  padding: 13px 20px;
+  border: none;
+  color: white;
+  border-radius: 5px;
+  font-weight: 500;
+}
+.popover-content .popover-action .delete-btn {
+  background-color: #dc3545;
+}
+.popover-content .popover-action .delete-btn:hover {
+  background-color: #a12834;
+}
+.popover-content .popover-action .cancel-btn {
+  background-color: #18181B;
+}
+.popover-content .popover-action .cancel-btn:hover {
+  color: #0d6efd;
+}
+
+.popover.show .popover-content {
+  transform: translateY(0);
+}
+
 input[type=date]::-webkit-calendar-picker-indicator,
 input[type=time]::-webkit-calendar-picker-indicator {
   filter: invert(1);
@@ -172,12 +243,10 @@ body {
 }
 .tracker-main-container .header .settings .logout-button {
   display: flex;
+  justify-content: center;
+  align-items: center;
   width: 130px;
   height: 45px;
-  align-items: center;
-  padding-right: 20px;
-  gap: 5px;
-  justify-content: end;
   position: absolute;
   top: 50px;
   right: 0;
@@ -198,6 +267,7 @@ body {
 }
 .tracker-main-container .header .settings .logout-button i, .tracker-main-container .header .settings .logout-button button {
   font-size: 16px;
+  margin-right: 5px;
 }
 .tracker-main-container .header .settings .logout-button:hover i, .tracker-main-container .header .settings .logout-button:hover button {
   color: #0d6efd;
@@ -319,9 +389,9 @@ body {
 }
 .tracker-main-container .activity-container .cont.progress-container .progress-bar-bg .progress-bar {
   align-self: flex-start;
-  width: 70%;
   background-color: #00bc7d;
   height: 100%;
+  transition: width 0.5s ease-in-out;
 }
 .tracker-main-container .activity-container .cont.progress-container .progress-hours-info {
   display: flex;
@@ -415,6 +485,11 @@ body {
 .tracker-main-container .time-entry-container .time-entry-header i:hover {
   color: #00bc7d;
 }
+.tracker-main-container .time-entry-container .time-entry-instance-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
 .tracker-main-container .time-entry-container .instance {
   border: 1px solid #303030;
   border-radius: 10px;
@@ -427,22 +502,43 @@ body {
 .tracker-main-container .time-entry-container .instance .title .action {
   display: flex;
   gap: 7px;
+  /*
+  button {
+      padding: 8px 9px;
+      border-radius: 3px;
+      cursor: pointer;
+      border: none;
+      color: white; 
+
+      &:hover {
+          opacity: 70%;
+      }
+
+      i {
+          font-size: 13px;
+      }
+
+  }
+  .edit {
+      background-color: #007bff;
+  }
+  .delete {
+      background-color: #DC4C64;
+  }
+  */
 }
-.tracker-main-container .time-entry-container .instance .title .action div {
-  padding: 5px 8px;
+.tracker-main-container .time-entry-container .instance .title .action button {
+  padding: 8px 9px;
   border-radius: 3px;
   cursor: pointer;
+  border: 1px solid #303030;
+  color: rgb(204, 201, 201);
+  background-color: transparent;
 }
-.tracker-main-container .time-entry-container .instance .title .action div:hover {
-  opacity: 70%;
-}
-.tracker-main-container .time-entry-container .instance .title .action div i {
-  font-size: 13px;
-}
-.tracker-main-container .time-entry-container .instance .title .action .edit {
+.tracker-main-container .time-entry-container .instance .title .action .edit:hover {
   background-color: #007bff;
 }
-.tracker-main-container .time-entry-container .instance .title .action .delete {
+.tracker-main-container .time-entry-container .instance .title .action .delete:hover {
   background-color: #DC4C64;
 }
 .tracker-main-container .time-entry-container .instance .time {
@@ -455,6 +551,13 @@ body {
   margin-top: 13px;
   font-size: 17px;
   font-weight: bold;
+}
+.tracker-main-container .time-entry-container .no-entry {
+  text-align: center;
+  padding-bottom: 20px;
+  opacity: 35%;
+  font-size: 17px;
+  font-family: "League Spartan", sans-serif;
 }
 
 footer {
@@ -471,7 +574,7 @@ footer a {
 }
 
 body.light-mode {
-  background-color: #ffffff !important;
+  background-color: #e1e1e2 !important;
   color: black !important;
 }
 body.light-mode .cont {
@@ -479,6 +582,10 @@ body.light-mode .cont {
   color: black !important;
   border: 1px solid #dee2e6 !important;
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+}
+body.light-mode .cont button {
+  color: black !important;
+  cursor: pointer;
 }
 body.light-mode .cont:hover .logout-btn {
   color: #0d6efd !important;
@@ -495,6 +602,18 @@ body.light-mode .cont .action i {
 body.light-mode .instance {
   border: 1px solid #dee2e6 !important;
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+}
+body.light-mode .instance .action button {
+  border: 1px solid #dee2e6 !important;
+}
+body.light-mode .instance .action button i {
+  color: rgb(84, 83, 83) !important;
+}
+body.light-mode .instance .action .edit:hover i {
+  color: white !important;
+}
+body.light-mode .instance .action .delete:hover i {
+  color: white !important;
 }
 body.light-mode .input {
   background-color: white !important;

@@ -8,28 +8,11 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/circle-progress@1.2.2/dist/circle-progress.min.js"></script>
 </head>
 <body>
-
-    
-    <!-- <div class="header">
-        <h2>Welcome to Your Profile</h2>
-        <div>
-            <img src="{{ profile_picture }}" alt="Profile Picture" class="profile-pic">
-        </div>
-    </div>
-    
-    <div class="profile-container">
-        <div class="user-info">
-            <h3>Hello, {{ name }}!</h3>
-            <p>Your email: {{ email }}</p>
-            <form method="post" action="{% url 'logout' %}">
-                {% csrf_token %}
-                <button type="submit" class="logout-btn">Logout</button>
-            </form>
-        </div>
-    </div> -->
 
     <div class="tracker-main-container">
 
@@ -48,8 +31,8 @@
                     <img src="{{ profile_picture }}" alt="Profile Picture" class="profile-pic">
                 </div>
                 <div class="cont logout-button" id="logoutBtn">
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
                     <form method="post" action="{% url 'logout' %}">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
                         {% csrf_token %}
                         <button type="submit" class="logout-btn">Logout</button>
                     </form>
@@ -70,7 +53,7 @@
                                 stroke-dashoffset="282.743" />
                     </svg>
                     <div class="progress-text">
-                        <span class="progress-percent">75%</span>
+                        <span class="progress-percent">0%</span>
                         <span class="progress-label">Complete</span>
                     </div>
                 </div>
@@ -80,13 +63,22 @@
                 </div>
 
                 <div class="progress-hours-info">
-                    <span>75 hours completed</span>
-                    <span>500 hours required</span>
+                    <span><span id="renderedHoursDisplay">{{rendered_hours}}</span> hours completed</span>
+                    <span><span id="requiredHoursDisplay">{{required_hours}}</span> hours required</span>
                 </div>
 
                 <label for="required_hours">Total Required Hours:</label>
 
-                <input class="input hours-input" type="number" maxlength="4" min="1" name="required_hours" oninput="if(this.value.length > 4) this.value = this.value.slice(0, 4);">
+                <input 
+                    class="input hours-input" 
+                    type="number" 
+                    maxlength="4" 
+                    min="1" 
+                    name="required_hours" 
+                    id="requiredHoursInput"
+                    value="{{ required_hours }}" 
+                    oninput="if(this.value.length > 4) this.value = this.value.slice(0, 4);">
+
             </div>
 
             <div class="cont form-container">
@@ -139,20 +131,39 @@
                 </div>
             </div>
 
-            <div class="instance">
-                <div class="title">
-                    <h3>Monday, April 14, 2025</h3>
-                    <div class="action">
-                        <div class="edit"><i class="fa-solid fa-pen-to-square"></i></div>
-                        <div class="delete"><i class="fa-solid fa-trash"></i></div>
+            <div class="time-entry-instance-container">
+                
+                <div class="no-entry">No time entries to show.</div>
+
+                <!-- <div class="instance">
+                    <div class="title">
+                        <h3>Monday, April 14, 2025</h3>
+                        <div class="action">
+                            <div class="edit"><i class="fa-solid fa-pen-to-square"></i></div>
+                            <div class="delete"><i class="fa-solid fa-trash"></i></div>
+                        </div>
                     </div>
-                </div>
-                <div class="time">
-                    <p>Morning: 10:00 - 12:00 <span>(2.00 hours)</span></p> 
-                    <p>Afternoon: 13:00 - 18:00 <span>(5.00 hours)</span></p>
-                    <p>Evening: 18:00 - 19:00 <span>(1.00 hour)</span></p>
-                </div>
-                <p class="total-hours">Total Hours: 8.00</p>
+                    <div class="time">
+                        <p>Morning: 10:00 - 12:00 <span>(2.00 hours)</span></p> 
+                        <p>Afternoon: 13:00 - 18:00 <span>(5.00 hours)</span></p>
+                        <p>Evening: 18:00 - 19:00 <span>(1.00 hour)</span></p>
+                    </div>
+                    <p class="total-hours">Total Hours: 8.00</p>
+                </div> -->
+
+            </div>
+            
+        </div>
+    </div>
+
+    <div class="popover" id="popover">
+        <div class="popover-content">
+            <div class="popover-message">
+                <p>Are you sure you want to delete this entry?</p>
+            </div>
+            <div class="popover-action">
+                <button class="cancel-btn">Cancel</button>
+                <button class="delete-btn">Delete</button>
             </div>
         </div>
     </div>
@@ -161,6 +172,8 @@
         <script>window.location.href = "/";</script>
     {% endif %}
     <script>
+
+        const popover = document.getElementById("popover");
 
         function getCookie(name) {
 
@@ -191,9 +204,157 @@
             percentElement.textContent = percent + '%';
         }
 
+        function computeHours(startTime, endTime) {
+            if (!startTime || !endTime) return 0;
+            
+            const start = new Date(`1970-01-01T${startTime}`);
+            const end = new Date(`1970-01-01T${endTime}`);
+
+            let diffMs = end - start;
+
+            if (diffMs < 0) {
+                // If end time is "earlier" than start time, assume it's next day
+                diffMs += 24 * 60 * 60 * 1000;
+            }
+
+            const diffHours = diffMs / (1000 * 60 * 60); // convert milliseconds to hours
+            return diffHours.toFixed(2); // keep 2 decimal places
+        }
+
+        function formatTimeTo12Hr(timeString) {
+            if (!timeString) return '';
+
+            const [hours, minutes] = timeString.split(':');
+            const date = new Date();
+            date.setHours(parseInt(hours));
+            date.setMinutes(parseInt(minutes));
+
+            const options = { hour: 'numeric', minute: '2-digit', hour12: true };
+            return date.toLocaleTimeString([], options);
+        }
+    
+        function updateTimeEntryDisplay(id) {
+
+            fetch(`/api/time-entries/${id}/`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken') // CSRF token for security
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+
+                console.log("User Time Entries: ", data);
+                
+                if (data && data.length > 0) {
+                    // Handle displaying the time entries
+                    const timeEntriesContainer = document.querySelector('.time-entry-instance-container');
+                    timeEntriesContainer.innerHTML = ''; // Clear previous entries
+
+                    data.forEach(entry => {
+                        // Create a new container for each time entry instance
+                        const entryDiv = document.createElement('div');
+                        entryDiv.classList.add('instance');
+
+                        const dateObj = new Date(entry.date);
+                        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                        const formattedDate = dateObj.toLocaleDateString('en-US', options);
+
+                        // Fill in the title (date)
+                        const titleDiv = document.createElement('div');
+                        titleDiv.classList.add('title');
+                        titleDiv.innerHTML = `
+                            <h3>${formattedDate}</h3>
+                            <div class="action">
+                                <button data-instance-no="${entry.no}" class="edit"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button data-instance-no="${entry.no}" class="delete"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        `;
+
+                        // Add the time entries (morning, afternoon, evening)
+                        const timeDiv = document.createElement('div');
+                        timeDiv.classList.add('time');
+                        
+                        let timeDetails = '';
+
+                        if (entry.morning_in && entry.morning_out) {
+                            const morningHours = computeHours(entry.morning_in, entry.morning_out);
+
+                            timeDetails += `
+                                <p>Morning: ${formatTimeTo12Hr(entry.morning_in)} - ${formatTimeTo12Hr(entry.morning_out)} <span>(${morningHours} hours)</span></p>
+                            `;
+                        }
+
+                        if (entry.afternoon_in && entry.afternoon_out) {
+                            const afternoonHours = computeHours(entry.afternoon_in, entry.afternoon_out);
+
+                            timeDetails += `
+                                <p>Afternoon: ${formatTimeTo12Hr(entry.afternoon_in)} - ${formatTimeTo12Hr(entry.afternoon_out)} <span>(${afternoonHours} hours)</span></p>
+                            `;
+                        }
+
+                        if (entry.evening_in && entry.evening_out) {
+                            const eveningHours = computeHours(entry.evening_in, entry.evening_out);
+
+                            timeDetails += `
+                                <p>Evening: ${formatTimeTo12Hr(entry.evening_in)} - ${formatTimeTo12Hr(entry.evening_out)} <span>(${eveningHours} hours)</span></p>
+                            `;
+                        }
+
+                        timeDiv.innerHTML = timeDetails;
+
+                        // Add the total hours
+                        const totalHoursPara = document.createElement('p');
+                        totalHoursPara.classList.add('total-hours');
+                        totalHoursPara.textContent = `Total Hours: ${entry.total_hours}`;
+
+                        // Append the title, time, and total hours to the entry div
+                        entryDiv.appendChild(titleDiv);
+                        entryDiv.appendChild(timeDiv);
+                        entryDiv.appendChild(totalHoursPara);
+
+                        // Append the new entry to the container
+                        timeEntriesContainer.appendChild(entryDiv);
+                    });
+
+                    const deleteBtns = document.querySelectorAll('.delete');
+                    deleteBtns.forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            popover.classList.add("show");
+                            const instanceNo = this.getAttribute('data-instance-no');
+                        });
+                    });
+
+                } else {
+                    timeEntriesContainer.innerHTML = '<div class="no-entry">No time entries to show.</div>';
+                }
+                
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Failed to fetch time entries.');
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
 
-            updateProgress(70);
+            updateTimeEntryDisplay("{{id}}");
+
+            let required_hours = parseFloat("{{required_hours}}");
+            let rendered_hours = parseFloat("{{rendered_hours}}");
+            const progressBar = document.querySelector('.progress-bar');
+
+            const renderedHoursDisplay = document.getElementById('renderedHoursDisplay');
+
+            if(rendered_hours > required_hours) {
+                updateProgress(100);
+                progressBar.style.width = "100%";
+            } else {
+                let percentage = Math.round((rendered_hours / required_hours) * 100);
+                updateProgress(percentage);
+                progressBar.style.width = percentage+"%";
+            }
 
             const checkbox = document.getElementById("checkbox")
             checkbox.addEventListener("change", () => {
@@ -250,6 +411,13 @@
             // Initial check
             validateForm();
 
+            const notyf = new Notyf({
+                duration: 3000, // Auto-close after 3 seconds
+                position: { x: "right", y: "bottom" }, // 📌 Lower-left position
+                dismissible: true, // Allow manual close
+                ripple: true, // Add ripple effect
+            });
+
             addTimeEntryBtn.addEventListener('click', function() {
 
                 const spinnerCont = document.querySelector('.spinner-cont');
@@ -280,13 +448,27 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.message) {
-                        console.log(data.message);
-                        timeEntryForm.reset();
+
                         setTimeout(() => {
                             addTimeEntryBtn.style.display = 'block';
                             spinnerCont.style.display = 'none';
-                        }, 1000);
+                            timeEntryForm.reset();
+                        }, 2000);
+                        
+                        renderedHoursDisplay.textContent = data.rendered_hours;
 
+                        if(data.rendered_hours > data.required_hours) {
+                            updateProgress(100);
+                            progressBar.style.width = "100%";
+                        } else {
+                            let percentage = Math.round((data.rendered_hours / data.required_hours) * 100);
+                            updateProgress(percentage);
+                            progressBar.style.width = percentage+"%";
+                        }
+                        
+                        updateTimeEntryDisplay("{{id}}");
+                        
+                        notyf.success("Time entry added successfully!");
                     } else {
                         console.error(data);
                         alert('Failed to record time entry.');
@@ -298,6 +480,47 @@
                 });
 
             });
+
+            const requiredHoursInput = document.getElementById('requiredHoursInput');
+            const requiredHoursDisplay = document.getElementById('requiredHoursDisplay');
+
+            requiredHoursInput.addEventListener('change', function() {
+
+                let newRequiredHours = this.value;
+
+                fetch('/api/update-required-hours/', {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({ required_hours: newRequiredHours })
+                })
+                .then(response => response.json())
+                .then(data => {
+
+                    newRequiredHours = parseFloat(newRequiredHours);
+                    
+                    if(data.rendered_hours > newRequiredHours) {
+                        updateProgress(100);
+                        progressBar.style.width = "100%";
+                    } else {
+                        let percentage = Math.round((data.rendered_hours / newRequiredHours) * 100);
+                        updateProgress(percentage);
+                        progressBar.style.width = percentage+"%";
+                    }
+                    
+                    requiredHoursDisplay.textContent = Number.isInteger(newRequiredHours) 
+                        ? newRequiredHours 
+                        : newRequiredHours.toFixed(2);
+
+                    console.log(data.message || data.error);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+
 
         });
 

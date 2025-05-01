@@ -11,6 +11,7 @@ urlpatterns = [
     path('test/', views.test),
     path('api/time-entry/', views.TimeEntryView.as_view(), name='time-entry'),
     path('api/update-required-hours/', views.UpdateRequiredHoursView.as_view(), name='update-required-hours'),
-    path('api/time-entries/<int:id>/', views.TimeEntryListView.as_view(), name='time-entry-list'),
+    path('api/time-entries/<int:id>/', views.TimeEntryListView.as_view()),
+    path('api/time-entries/<int:id>/<int:no>/', views.TimeEntryListView.as_view()),
     path('delete-time-entry/<int:no>/', views.delete_time_entry, name='delete_time_entry'),
 ]

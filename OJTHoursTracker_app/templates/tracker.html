@@ -82,8 +82,8 @@
             </div>
 
             <div class="cont form-container">
-                <form id="timeEntryForm" action="" method="POST">
-                    <h3>Record Time Entry</h3>
+                <form class="entry-form"  id="timeEntryForm" action="" method="POST">
+                    <h3>Record Time Entry</h3> 
                     <label for="date"><i class="fa-regular fa-calendar"></i> Date</label>
                     <input type="date" class="input date-input" name="date">
                     <div class="time">
@@ -113,7 +113,7 @@
                             <p>Time Out</p>
                         </div>
                     </div>
-                    <button id="addTimeEntryBtn" type="button" disabled>Add Time Entry</button>
+                    <button id="addTimeEntryBtn" class="action-btn" type="button" disabled>Add Time Entry</button>
                     <div class="spinner-cont">
                         <span class="loader"></span>
                     </div>
@@ -168,23 +168,130 @@
         </div>
     </div>
 
+    <div class="popover" id="updatePopover">
+        <div class="popover-content update">
+            <i class="fa-solid fa-xmark" id="updateFormCloseBtn"></i>
+            <form class="entry-form" id="updateTimeEntryForm" action="" method="POST">
+                <h3>Update Time Entry</h3>
+                <label for="date"><i class="fa-regular fa-calendar"></i> Date</label>
+                <input type="date" class="input date-input" name="date">
+                <div class="time">
+                    <label for=""><i class="fa-regular fa-clock"></i> Morning</label>
+                    <div class="time-container">
+                        <input class="input time-input" type="time" name="time">
+                        <input class="input time-input" type="time" name="time">
+                        <p>Time In</p>
+                        <p>Time Out</p>
+                    </div>
+                </div>
+                <div class="time">
+                    <label for=""><i class="fa-regular fa-clock"></i> Afternoon</label>
+                    <div class="time-container">
+                        <input class="input time-input" type="time" name="time">
+                        <input class="input time-input" type="time" name="time">
+                        <p>Time In</p>
+                        <p>Time Out</p>
+                    </div>
+                </div>
+                <div class="time">
+                    <label for=""><i class="fa-regular fa-clock"></i> Evening (Optional)</label>
+                    <div class="time-container">
+                        <input class="input time-input" type="time" name="time">
+                        <input class="input time-input" type="time" name="time">
+                        <p>Time In</p>
+                        <p>Time Out</p>
+                    </div>
+                </div>
+                <button id="updateTimeEntryBtn" type="button" class="action-btn" disabled>Update Time Entry</button>
+                <button type="button" id="cancelUpdateTimeEntryBtn" class="cancel-update-btn">Cancel</button>
+                <div class="spinner-cont">
+                    <span class="loader"></span>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+
     {% if not user.is_authenticated %}
         <script>window.location.href = "/";</script>
     {% endif %}
+
     <script>
+
         const renderedHoursDisplay = document.getElementById('renderedHoursDisplay');
         const deletePopover = document.getElementById("deletePopover");
+        const updatePopover = document.getElementById("updatePopover");
+
+        const spinnerCont = document.querySelector('.spinner-cont');
+
+        const progressBar = document.querySelector('.progress-bar');
+
+        const requiredHoursDisplay = document.getElementById('requiredHoursDisplay');
+
+        const updateTimeEntryForm = document.getElementById('updateTimeEntryForm');
+
         let selectedInstance = null;
 
         const notyf = new Notyf({
             duration: 3000, // Auto-close after 3 seconds
-            position: { x: "right", y: "bottom" }, // 📌 Lower-left position
+            position: { x: "right", y: "bottom" }, // Lower-left position
             dismissible: true, // Allow manual close
             ripple: true, // Add ripple effect
         });
 
         const timeEntriesContainer = document.querySelector('.time-entry-instance-container');
 
+        function resetTrackerUI(data, action) {
+
+            if(action === 'add') {
+                addTimeEntryBtn.style.display = 'block';
+                spinnerCont.style.display = 'none';
+                timeEntryForm.reset();
+                addTimeEntryBtn.style.opacity = '50%';
+                addTimeEntryBtn.disabled = true;
+
+                notyf.success("Time entry added successfully!");
+
+            } else if (action === "update") {
+
+                updateTimeEntryBtn.style.opacity = '50%';
+                updateTimeEntryBtn.disabled = true;
+
+                notyf.success("Time entry updated successfully!");
+            
+            } else if (action === "delete") {
+
+                notyf.success("Time entry deleted successfully!");
+                
+            } else if (action === "edit") {
+                requiredHoursDisplay.textContent = Number.isInteger(data.new_required_hours) 
+                        ? data.new_required_hours 
+                        : data.new_required_hours.toFixed(2);
+
+                notyf.success("Required hours saved!");
+
+                renderedHoursDisplay.textContent = data.rendered_hours;
+
+                let percentage = Math.round((data.rendered_hours / data.new_required_hours) * 100);
+                if (percentage > 100) percentage = 100;
+                updateProgress(percentage);
+                progressBar.style.width = percentage + "%";
+
+                return;
+            }
+
+            renderedHoursDisplay.textContent = data.rendered_hours;
+
+            let percentage = Math.round((data.rendered_hours / data.required_hours) * 100);
+            if (percentage > 100) percentage = 100;
+            updateProgress(percentage);
+            progressBar.style.width = percentage + "%";
+
+            updateTimeEntryDisplay("{{id}}");
+
+        }
+        
         function getCookie(name) {
 
             let cookieValue = null;
@@ -214,6 +321,70 @@
             percentElement.textContent = percent + '%';
         }
 
+        function validateForm(event) {
+            
+            const form = event.target.closest('form');
+            if (!form) return;
+            
+            const dateInput = form.querySelector('input[name="date"]');
+            const dateFilled = dateInput && dateInput.value.trim() !== '';
+
+            const actionBtn = form.querySelector('.action-btn');
+            const timeContainers = form.querySelectorAll('.time-container');
+
+            let hasCompletePair = false;
+            let hasIncompletePair = false;
+
+            timeContainers.forEach(container => {
+                const [timeIn, timeOut] = container.querySelectorAll('input[type="time"]');
+                const inValue = timeIn?.value.trim();
+                const outValue = timeOut?.value.trim();
+
+                if (inValue && outValue) {
+                    hasCompletePair = true;
+                } else if (inValue || outValue) {
+                    hasIncompletePair = true; // only one filled
+                }
+            });
+
+            if (dateFilled && hasCompletePair && !hasIncompletePair) {
+                actionBtn.style.opacity = "100%";
+                actionBtn.disabled = false;
+            } else {
+                actionBtn.style.opacity = "50%";
+                actionBtn.disabled = true;
+            }
+
+
+            /*
+            let atLeastOneCompletePair = false;
+
+            timeContainers.forEach(container => {
+                const times = container.querySelectorAll('input[type="time"]');
+                if (times.length === 2) {
+                    const timeIn = times[0].value.trim();
+                    const timeOut = times[1].value.trim();
+                    if (timeIn !== '' && timeOut !== '') {
+                        atLeastOneCompletePair = true;
+                    }
+                }
+            });
+
+            const actionBtn = form.querySelector('.action-btn');
+
+            //actionBtn.disabled = !(dateFilled && atLeastOneCompletePair);
+
+
+            if (dateFilled && atLeastOneCompletePair) {
+                actionBtn.style = 'opacity: 100%!important';
+                actionBtn.disabled = false;
+            } else {
+                actionBtn.style = 'opacity: 50%!important';
+                actionBtn.disabled = true;
+            }
+            */
+        }
+        
         function computeHours(startTime, endTime) {
             if (!startTime || !endTime) return 0;
             
@@ -329,8 +500,16 @@
                     deleteBtns.forEach(btn => {
                         btn.addEventListener('click', function() {
                             deletePopover.classList.add("show");
-                            //const instanceNo = this.getAttribute('data-instance-no');
                             selectedInstance = this.getAttribute('data-instance-no');
+                        });
+                    });
+
+                    const updateBtns = document.querySelectorAll('.edit');
+                    updateBtns.forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            updatePopover.classList.add("show");
+                            selectedInstance = this.getAttribute('data-instance-no');
+                            populateUpdateTimeEntryForm("{{id}}");
                         });
                     });
 
@@ -374,28 +553,120 @@
                         }
                     })
                     .then(data => {
-
-                        updateTimeEntryDisplay("{{id}}");
-
-                        notyf.success("Time entry deleted successfully!");
-
-                        renderedHoursDisplay.textContent = data.rendered_hours;
-
-                        if (data.rendered_hours > data.required_hours) {
-                            updateProgress(100);
-                            progressBar.style.width = "100%";
-                        } else {
-                            let percentage = Math.round((data.rendered_hours / data.required_hours) * 100);
-                            updateProgress(percentage);
-                            progressBar.style.width = percentage + "%";
-                        }
+                        resetTrackerUI(data, "delete");
                     })
                     .catch(error => console.error('Error:', error));
 
                     selectedInstance = null;
-                    
                 }
             };
+
+            const updatePopoverCloseButtons = ['#updateFormCloseBtn', '#cancelUpdateTimeEntryBtn'];
+
+            updatePopoverCloseButtons.forEach(selector => {
+                document.querySelector(selector).addEventListener('click', () => {
+                    updatePopover.classList.remove('show');
+                    updateTimeEntryBtn.style.opacity = '50%';
+                    updateTimeEntryBtn.disabled = true;
+                });
+            });
+
+            updateTimeEntryBtn.onclick = async function () {
+
+                if (!selectedInstance) return;
+
+                const date = updateTimeEntryForm.querySelector('input[name="date"]').value;
+
+                const timeInputs = updateTimeEntryForm.querySelectorAll('.time-container input[type="time"]');
+                const [morningIn, morningOut, afternoonIn, afternoonOut, eveningIn, eveningOut] = [...timeInputs].map(input => input.value || null);
+
+                // Construct payload
+                const data = {
+                    date,
+                    morning_in: morningIn,
+                    morning_out: morningOut,
+                    afternoon_in: afternoonIn,
+                    afternoon_out: afternoonOut,
+                    evening_in: eveningIn,
+                    evening_out: eveningOut
+                };
+
+                try {
+                    const response = await fetch(`/api/time-entries/${"{{id}}"}/${selectedInstance}/`, {
+                        method: 'PUT', 
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken') // If CSRF is enforced
+                        },
+                        body: JSON.stringify(data)
+                    });
+
+                    if (response.ok) {
+
+                        updatePopover.classList.remove('show');
+                        const responseData = await response.json();
+                        resetTrackerUI(responseData, "update");
+                        
+
+                    } else {
+                        const errorData = await response.json();
+                        console.error('Update failed:', errorData);
+                        notyf.error("Failed to update time entry.");
+                    }
+
+                } catch (err) {
+                    console.error('Error:', err);
+                }
+            };
+
+        }
+        
+        function populateUpdateTimeEntryForm(id) {
+            
+            if(selectedInstance) {
+
+                fetch(`/api/time-entries/${id}/${selectedInstance}/`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken') // CSRF token for security
+                }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data.date);
+                    const date = updateTimeEntryForm.querySelector('input[name="date"]');
+                    date.value = data.date;
+
+                    const timeContainers = updateTimeEntryForm.querySelectorAll('.time-container');
+
+                    // Morning
+                    const [morningIn, morningOut] = timeContainers[0].querySelectorAll('input');
+                    morningIn.value = data.morning_in || '';
+                    morningOut.value = data.morning_out || '';
+
+                    // Afternoon
+                    const [afternoonIn, afternoonOut] = timeContainers[1].querySelectorAll('input');
+                    afternoonIn.value = data.afternoon_in || '';
+                    afternoonOut.value = data.afternoon_out || '';
+
+                    // Evening
+                    const [eveningIn, eveningOut] = timeContainers[2].querySelectorAll('input');
+                    eveningIn.value = data.evening_in || '';
+                    eveningOut.value = data.evening_out || '';
+
+                    // if((data.morning_in && data.morning_out) || (data.afternoon_in && data.afternoon_out) || (data.evening_in && data.evening_out)) {
+                    //     updateTimeEntryForm.querySelector('.action-btn')
+                    // }
+
+                    //console.log(data.)
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Failed to fetch time entries.');
+                });
+
+            }
 
         }
         
@@ -407,7 +678,6 @@
 
             let required_hours = parseFloat("{{required_hours}}");
             let rendered_hours = parseFloat("{{rendered_hours}}");
-            const progressBar = document.querySelector('.progress-bar');
 
             if(rendered_hours > required_hours) {
                 updateProgress(100);
@@ -436,46 +706,15 @@
                 }
             });
 
-            const dateInput = document.querySelector('input[name="date"]');
-            const addTimeEntryBtn = document.getElementById('addTimeEntryBtn');
-            const timeEntryForm = document.getElementById('timeEntryForm');
-
-            function validateForm() {
-                const dateFilled = dateInput.value.trim() !== '';
-
-                // Group time inputs into sets of two (Time In, Time Out)
-                const timeContainers = document.querySelectorAll('.time-container');
-                let atLeastOneCompletePair = false;
-
-                timeContainers.forEach(container => {
-                    const times = container.querySelectorAll('input[type="time"]');
-                    if (times.length === 2) {
-                        const timeIn = times[0].value.trim();
-                        const timeOut = times[1].value.trim();
-                        if (timeIn !== '' && timeOut !== '') {
-                            atLeastOneCompletePair = true;
-                        }
-                    }
-                });
-
-                addTimeEntryBtn.disabled = !(dateFilled && atLeastOneCompletePair);
-
-                if(dateFilled && atLeastOneCompletePair) {
-                    addTimeEntryBtn.style = 'opacity: 100%! important';
-                }
-            }
-
-            // Attach listener to all time inputs and the date input
+            //Attach listener to all time inputs and the date input
             document.querySelectorAll('input[type="time"], input[name="date"]').forEach(input => {
                 input.addEventListener('input', validateForm);
             });
 
-            // Initial check
-            validateForm();
+            const addTimeEntryForm = document.getElementById('timeEntryForm');
 
             addTimeEntryBtn.addEventListener('click', function() {
 
-                const spinnerCont = document.querySelector('.spinner-cont');
                 addTimeEntryBtn.style.display = 'none';
                 spinnerCont.style.display = 'flex';
 
@@ -502,33 +741,12 @@
                 })
                 .then(res => res.json())
                 .then(data => {
-                    if (data.message) {
-
+                    if (data.message != 'invalid') {
                         setTimeout(() => {
-                            addTimeEntryBtn.style.display = 'block';
-                            spinnerCont.style.display = 'none';
-                            timeEntryForm.reset();
-
-                            renderedHoursDisplay.textContent = data.rendered_hours;
-
-                            if(data.rendered_hours > data.required_hours) {
-                                updateProgress(100);
-                                progressBar.style.width = "100%";
-                            } else {
-                                let percentage = Math.round((data.rendered_hours / data.required_hours) * 100);
-                                updateProgress(percentage);
-                                progressBar.style.width = percentage+"%";
-                            }
-                            
-                            updateTimeEntryDisplay("{{id}}");
-
-                            notyf.success("Time entry added successfully!");
-                            
+                            resetTrackerUI(data, "add");
                         }, 2000);
-                        
-                        
-                        
                     } else {
+                        notyf.success("Invalid time session");
                         console.error(data);
                         alert('Failed to record time entry.');
                     }
@@ -541,7 +759,7 @@
             });
 
             const requiredHoursInput = document.getElementById('requiredHoursInput');
-            const requiredHoursDisplay = document.getElementById('requiredHoursDisplay');
+            
 
             requiredHoursInput.addEventListener('change', function() {
 
@@ -559,23 +777,11 @@
                 .then(data => {
 
                     newRequiredHours = parseFloat(newRequiredHours);
-                    
-                    if(data.rendered_hours > newRequiredHours) {
-                        updateProgress(100);
-                        progressBar.style.width = "100%";
-                    } else {
-                        let percentage = Math.round((data.rendered_hours / newRequiredHours) * 100);
-                        updateProgress(percentage);
-                        progressBar.style.width = percentage+"%";
-                    }
-                    
-                    requiredHoursDisplay.textContent = Number.isInteger(newRequiredHours) 
-                        ? newRequiredHours 
-                        : newRequiredHours.toFixed(2);
 
-                    notyf.success("Required hours saved!");
+                    data['new_required_hours'] = newRequiredHours;
 
-                    console.log(data.message || data.error);
+                    resetTrackerUI(data, "edit");
+
                 })
                 .catch(error => {
                     console.error('Error:', error);

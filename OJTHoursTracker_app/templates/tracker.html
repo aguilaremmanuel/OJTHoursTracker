@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OJT Hours Tracker</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="icon" href="{% static 'images/logo.png' %}" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
@@ -15,7 +16,6 @@
 <body>
 
     <div class="tracker-main-container">
-
         <div class="header">
             <h1>OJT Hours Tracker</h1>
             <div class="settings">
@@ -154,6 +154,11 @@
             </div>
             
         </div>
+
+        <div class="footer">
+            <p>Made with ♡ using Django by <a href="https://www.facebook.com/emman.felizardo.7/" target="_blank" rel="noopener noreferrer">Emmanuel John Aguilar</a>.</p>
+        </div>
+
     </div>
 
     <div class="popover" id="deletePopover">
@@ -212,12 +217,13 @@
     </div>
 
 
-
     {% if not user.is_authenticated %}
         <script>window.location.href = "/";</script>
     {% endif %}
 
     <script>
+
+        let required_hours_temp = "{{required_hours}}";
 
         const renderedHoursDisplay = document.getElementById('renderedHoursDisplay');
         const deletePopover = document.getElementById("deletePopover");
@@ -275,8 +281,13 @@
 
                 let percentage = Math.round((data.rendered_hours / data.new_required_hours) * 100);
                 if (percentage > 100) percentage = 100;
-                updateProgress(percentage);
-                progressBar.style.width = percentage + "%";
+                if(percentage > 0) {
+                    updateProgress(percentage);
+                    progressBar.style.width = percentage + "%";
+                } else {
+                    updateProgress(0);
+                    progressBar.style.width = "0%";
+                }
 
                 return;
             }
@@ -285,8 +296,14 @@
 
             let percentage = Math.round((data.rendered_hours / data.required_hours) * 100);
             if (percentage > 100) percentage = 100;
-            updateProgress(percentage);
-            progressBar.style.width = percentage + "%";
+            if(percentage > 0) {
+                updateProgress(percentage);
+                progressBar.style.width = percentage + "%";
+            } else {
+                updateProgress(0);
+                progressBar.style.width = "0%";
+            }
+            
 
             updateTimeEntryDisplay("{{id}}");
 
@@ -606,12 +623,18 @@
                         updatePopover.classList.remove('show');
                         const responseData = await response.json();
                         resetTrackerUI(responseData, "update");
-                        
 
                     } else {
+
                         const errorData = await response.json();
                         console.error('Update failed:', errorData);
-                        notyf.error("Failed to update time entry.");
+
+                        if (errorData.message) {
+                            notyf.error(errorData.message);
+                        } else {
+                            notyf.error("Failed to update time entry.");
+                        }
+
                     }
 
                 } catch (err) {
@@ -682,6 +705,9 @@
             if(rendered_hours > required_hours) {
                 updateProgress(100);
                 progressBar.style.width = "100%";
+            } else if(rendered_hours == 0) {
+                updateProgress(0);
+                progressBar.style.width = "0%";
             } else {
                 let percentage = Math.round((rendered_hours / required_hours) * 100);
                 updateProgress(percentage);
@@ -739,18 +765,21 @@
                     },
                     body: JSON.stringify(payload)
                 })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.message != 'invalid') {
-                        setTimeout(() => {
-                            resetTrackerUI(data, "add");
-                        }, 2000);
+                .then(response => response.json().then(data => ({ status: response.status, data })))
+                .then(({ status, data }) => {
+                    if (status === 201) {
+                        setTimeout(() => resetTrackerUI(data, "add"), 2000);
+                    } else if (status === 405) {
+                        addTimeEntryBtn.style.display = 'block';
+                        spinnerCont.style.display = 'none';
+                        notyf.error("Please set the required hours before adding a time entry.");
                     } else {
-                        notyf.success("Invalid time session");
-                        console.error(data);
-                        alert('Failed to record time entry.');
+                        addTimeEntryBtn.style.display = 'block';
+                        spinnerCont.style.display = 'none';
+                        notyf.error(data.message || "Invalid time session");
                     }
                 })
+  
                 .catch(err => {
                     console.error(err);
                     alert('Something went wrong.');
@@ -763,7 +792,18 @@
 
             requiredHoursInput.addEventListener('change', function() {
 
-                let newRequiredHours = this.value;
+                let inputVal = this.value.trim();
+
+                // Only allow positive numbers or zero, optionally with decimal point
+                const validNumberPattern = /^(?:\d+|\d+\.\d+)$/;
+
+                if (!validNumberPattern.test(inputVal)) {
+                    notyf.error("Please enter a valid number.");
+                    this.value = required_hours_temp;
+                    return;
+                }
+
+                let newRequiredHours = parseFloat(inputVal);
 
                 fetch('/api/update-required-hours/', {
                     method: 'PATCH',
@@ -776,9 +816,11 @@
                 .then(response => response.json())
                 .then(data => {
 
+                    required_hours_temp =  inputVal;
+
                     newRequiredHours = parseFloat(newRequiredHours);
 
-                    data['new_required_hours'] = newRequiredHours;
+                    data['new_required_hours'] = newRequiredHours;  
 
                     resetTrackerUI(data, "edit");
 

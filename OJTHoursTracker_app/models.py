@@ -8,7 +8,7 @@ class User(AbstractUser):
     google_id = models.CharField(max_length=255, unique=True, null=True, blank=True)
     profile_picture = models.URLField(max_length=500, blank=True, null=True)
     required_hours = models.FloatField(null=True, blank=True, default=0)
-    rendered_hours = models.FloatField(null=True, blank=True)
+    rendered_hours = models.FloatField(null=True, blank=True, default=0)
     
     class Meta:
         db_table = 'tbl_user'

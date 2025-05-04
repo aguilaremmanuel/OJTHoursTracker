@@ -47,50 +47,59 @@ def logout(request):
     return redirect('google_signin')
 
 def validate_time_sessions(data):
-    def parse_time_field(field):
-        return datetime.strptime(data.get(field), "%H:%M").time() if data.get(field) else None
+    def parse_time(t):
+        if not t:
+            return None
+        if isinstance(t, time):
+            return t  # Already a time object
 
-    morning_in = parse_time_field("morning_in")
-    morning_out = parse_time_field("morning_out")
-    afternoon_in = parse_time_field("afternoon_in")
-    afternoon_out = parse_time_field("afternoon_out")
-    evening_in = parse_time_field("evening_in")
-    evening_out = parse_time_field("evening_out")
+        if isinstance(t, str):
+            if t.count(":") == 2:
+                try:
+                    return datetime.strptime(t, '%H:%M:%S').time()
+                except ValueError:
+                    pass
+            elif t.count(":") == 1:
+                try:
+                    return datetime.strptime(t, '%H:%M').time()
+                except ValueError:
+                    pass
 
-    def in_range(value, start, end):
-        return value and start <= value <= end
+        raise ValueError(f"Time format not recognized or invalid: {t}")
 
-    def in_evening_range(t):
-        return t and (time(17, 0) <= t <= time(23, 59) or time(0, 0) <= t <= time(8, 0))
 
-    def invalid_time_order(start, end):
-        return start and end and end <= start
+    print(data.get('morning_in'))
+    morning_in = parse_time(data.get('morning_in'))
+    print(morning_in)
+    morning_out = parse_time(data.get('morning_out'))
+    afternoon_in = parse_time(data.get('afternoon_in'))
+    afternoon_out = parse_time(data.get('afternoon_out'))
+    evening_in = parse_time(data.get('evening_in'))
+    evening_out = parse_time(data.get('evening_out'))
 
-    # Morning validation
-    if morning_in and not in_range(morning_in, time(1, 0), time(12, 0)):
-        return False
-    if morning_out and not in_range(morning_out, time(1, 0), time(12, 0)):
-        return False
-    if invalid_time_order(morning_in, morning_out):
-        return False
+    if morning_in and not time(1, 0) <= morning_in <= time(12, 0):
+        return False, 'Morning In must be between 1:00 AM and 12:00 PM.'
+    if morning_out and not time(1, 0) <= morning_out <= time(12, 0):
+        return False, 'Morning Out must be between 1:00 AM and 12:00 PM.'
+    if morning_in and morning_out and morning_in > morning_out:
+        return False, 'Morning time out is earlier than time in'
 
-    # Afternoon validation
-    if afternoon_in and not in_range(afternoon_in, time(12, 0), time(19, 0)):
-        return False
-    if afternoon_out and not in_range(afternoon_out, time(12, 0), time(19, 0)):
-        return False
-    if invalid_time_order(afternoon_in, afternoon_out):
-        return False
+    if afternoon_in and not time(12, 0) <= afternoon_in <= time(19, 0):
+        return False, 'Afternoon In must be between 12:00 PM and 7:00 PM.'
+    if afternoon_out and not time(12, 0) <= afternoon_out <= time(19, 0):
+        return False, 'Afternoon Out must be between 12:00 PM and 7:00 PM.'
+    if afternoon_in and afternoon_out and afternoon_in > afternoon_out:
+        return False, 'Afternoon time out is earlier than time in'
 
-    # Evening validation
-    if evening_in and not in_evening_range(evening_in):
-        return False
-    if evening_out and not in_evening_range(evening_out):
-        return False
-    if invalid_time_order(evening_in, evening_out):
-        return False
+    if evening_in and not (time(17, 0) <= evening_in <= time(23, 59) or time(0, 0) <= evening_in <= time(8, 0)):
+        return False, 'Evening In must be between 5:00 PM and 12:00 AM.'
+    if evening_out and not (time(17, 0) <= evening_out <= time(23, 59) or time(0, 0) <= evening_out <= time(8, 0)):
+        return False, 'Evening Out must be between 5:00 PM and 12:00 AM.'
+    if evening_in and evening_out and evening_in > evening_out:
+        return False, 'Evening Out is earlier than In.'
 
-    return True
+    return True, ''
+
 
 class TimeEntryView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -100,8 +109,12 @@ class TimeEntryView(APIView):
         data = request.data.copy()
         data['user'] = request.user.id
 
-        if not validate_time_sessions(data):
-            return Response({'message': 'invalid'}, status=status.HTTP_400_BAD_REQUEST)
+        if request.user.required_hours <= 0:
+            return Response({'message': 'Required hours not set.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        is_valid, message = validate_time_sessions(data)
+        if not is_valid:
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = TimeEntrySerializer(data=data)
         if serializer.is_valid():
@@ -150,6 +163,12 @@ class TimeEntryListView(APIView):
             time_entry = TimeEntry.objects.get(user_id=id, no=no)
         except TimeEntry.DoesNotExist:
             return Response({'detail': 'Time entry not found.'}, status=404)
+        
+        data = request.data.copy()
+
+        is_valid, message = validate_time_sessions(data)
+        if not is_valid:
+            return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
 
         old_total_hours = time_entry.total_hours or 0
         serializer = TimeEntrySerializer(time_entry, data=request.data)

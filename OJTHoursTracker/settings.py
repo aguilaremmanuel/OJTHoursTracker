@@ -45,9 +45,9 @@ MIDDLEWARE = [
     'OJTHoursTracker_app.middleware.NoCacheMiddleware',
 ]
 
-SESSION_COOKIE_AGE = 3600  # 1 hour session duration (adjust as needed)
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 365
 SESSION_SAVE_EVERY_REQUEST = True
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 ROOT_URLCONF = 'OJTHoursTracker.urls'
 

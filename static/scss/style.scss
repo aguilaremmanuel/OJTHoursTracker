@@ -515,8 +515,10 @@ body {
     }
 
     .time-entry-container {
+
         width: 100%;
         margin-top: 20px;
+        
 
         .time-entry-header {
             display: flex;
@@ -536,6 +538,32 @@ body {
             display: flex;
             flex-direction: column;
             gap: 15px;
+            height: auto;
+            max-height: 510px;
+            overflow-y: auto;
+            padding-right: 10px;
+
+            &::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            &::-webkit-scrollbar-track {
+                /* background: #f0f0f0; */ 
+                background: #222224;
+                border-radius: 10px;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background-color: #888;
+                border-radius: 10px;
+                border: 1px solid #ccc;
+            
+            }
+            
+              // For Firefox
+              scrollbar-width: thin;
+              scrollbar-color: #888 #222224;
+
         }
 
         .instance {
@@ -690,6 +718,7 @@ body {
         background-color: #04a46e;
         padding: 7px 0;
         border-radius: 0.25rem;
+        opacity: 50%;
 
         .loader {
             width: 20px;
@@ -714,19 +743,21 @@ body {
     }
 }
 
-footer {
-    width: 100%;
-    padding: 20px;
-    position: absolute;
-    bottom: 0;
+.footer p {
     text-align: center;
-    font-size: 14px;
-    opacity: 60%;
+    padding: 20px 0;
+    opacity: 50%;
 
     a {
-        text-decoration: underline;
+        color: $primary-color;
+
+        &:hover {
+            color: #77abfa;
+        }
+
     }
 }
+
 
 
 body.light-mode {
@@ -840,6 +871,26 @@ body.light-mode {
     input[type="date"]::-webkit-calendar-picker-indicator,
     input[type="time"]::-webkit-calendar-picker-indicator {
         filter: invert(0) !important;
+    }
+
+    .time-entry-instance-container {
+        &::-webkit-scrollbar-track {
+            background: #f3f3f3 !important;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: #888;
+        }
+          // For Fire fox
+          scrollbar-color: #888 #f3f3f3 !important;
+    }
+
+    .footer p {
+        a {
+            &:hover {
+                color: #063c8d;
+            }
+        }
     }
 
 }
